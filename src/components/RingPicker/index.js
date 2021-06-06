@@ -126,6 +126,10 @@ export function RingPicker({
     }),
   ).current;
 
+  function toRadians(angle) {
+    return angle * (Math.PI / 180);
+  }
+
   if (!visible) return null;
 
   return (
@@ -156,7 +160,66 @@ export function RingPicker({
         ]}>
         {data.length > 0 &&
           data.map((item, index) => {
-            const percent = 360 / data.length;
+            const length = data.length;
+            const degreePerItem = 360 / length;
+            const transformStyle = {
+              1: [
+                {
+                  translateY: index === 0 ? -width / 2 : 0,
+                },
+              ],
+              2: [
+                {
+                  translateY: index === 0 ? -width / 2 : 0,
+                },
+                {
+                  translateY: index === 1 ? width / 2 : 0,
+                },
+              ],
+              3: [
+                {
+                  translateY: index === 0 ? -width / 2 : 0,
+                },
+                {
+                  translateX:
+                    index === 1
+                      ? (Math.cos(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 1
+                      ? (Math.sin(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 2
+                      ? -(Math.cos(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 2
+                      ? (Math.sin(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+              ],
+              4: [
+                {
+                  translateY: index === 0 ? -width / 2 : 0,
+                },
+                {
+                  translateX: index === 1 ? width / 2 : 0,
+                },
+                {
+                  translateY: index === 2 ? width / 2 : 0,
+                },
+                {
+                  translateX: index === 3 ? -width / 2 : 0,
+                },
+              ],
+            };
             return (
               <Pressable
                 key={index}
@@ -165,17 +228,9 @@ export function RingPicker({
                   borderColor: 'blue',
                   borderWidth: 1,
                   transform: [
+                    ...transformStyle[length],
                     {
-                      translateY: index === 0 ? -width / 2 : 0,
-                    },
-                    {
-                      translateX: index === 1 ? width / 2 : 0,
-                    },
-                    {
-                      translateX: index === 2 ? -width / 2 : 0,
-                    },
-                    {
-                      rotate: `${percent * index}deg`,
+                      rotate: `${degreePerItem * index}deg`,
                     },
                   ],
                 }}

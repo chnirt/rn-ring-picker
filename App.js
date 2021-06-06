@@ -15,8 +15,8 @@ const CIRCLE1_SIZE = 200;
 const CIRCLE2_SIZE = 300;
 const CIRCLE3_SIZE = 400;
 
-const data1 = [...Array(3).keys()];
-const data2 = [...Array(3).keys()];
+const data1 = [...Array(1).keys()];
+const data2 = [...Array(2).keys()];
 const data3 = [...Array(3).keys()];
 
 const App = () => {
