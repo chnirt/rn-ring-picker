@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useEffect} from 'react';
 import {
   Animated,
   PanResponder,
@@ -24,6 +24,10 @@ export function RingPicker({
   const moveLimit = width * (length - 1);
 
   const pan = useRef(new Animated.ValueXY()).current;
+
+  useEffect(() => {
+    reset();
+  }, [visible]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -78,6 +82,10 @@ export function RingPicker({
 
   function toRadians(angle) {
     return angle * (Math.PI / 180);
+  }
+
+  function reset() {
+    pan.setValue({x: 0, y: 0});
   }
 
   if (!visible) return null;
