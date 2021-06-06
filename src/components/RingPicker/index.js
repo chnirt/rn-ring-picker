@@ -9,10 +9,9 @@ import {
 } from 'react-native';
 
 const RADIUS = 100;
-const buttons = [Array(5).keys()];
 
 export function RingPicker({
-  visible,
+  visible = false,
   width = RADIUS,
   contentContainerStyle,
   data = [],
@@ -274,10 +273,6 @@ const styles = StyleSheet.create({
     width: RADIUS * 2,
     aspectRatio: 1,
     borderRadius: RADIUS,
-    borderTopColor: 'red',
-    borderRightColor: 'orange',
-    borderLeftColor: 'pink',
-    borderBottomColor: 'purple',
     borderWidth: 5,
     justifyContent: 'center',
     alignItems: 'center',
