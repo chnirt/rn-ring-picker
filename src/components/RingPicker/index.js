@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import {
   Animated,
   PanResponder,
@@ -19,89 +19,41 @@ export function RingPicker({
   onPress = () => {},
   children,
 }) {
-  const pan1 = useRef(new Animated.ValueXY()).current;
+  const length = data.length;
+  const degreePerItem = 360 / length;
+  const degreeLimit = degreePerItem * (length - 1);
+  const moveLimit = width * (length - 1);
 
-  // const pan = useRef(new Animated.Value(0)).current;
-
-  function getDegree(anchor, point, type = 'right') {
-    const directions = {
-      right: 0,
-      top: 90,
-      left: 180,
-      bottom: 270,
-    };
-    const dy = anchor.y - point.y;
-    const dx = anchor.x - point.x;
-    const angle = Math.atan2(dy, dx);
-    const degree = (angle * 180) / Math.PI + 180;
-
-    return degree;
-  }
+  const pan = useRef(new Animated.ValueXY()).current;
 
   const panResponder = useRef(
     PanResponder.create({
       // Ask to be the responder:
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       // onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      // onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      // onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 
       onPanResponderGrant: (evt, gestureState) => {
         // The gesture has started. Show visual feedback so the user knows
         // what is happening!
         // gestureState.d{x,y} will be set to zero now
-        console.log('onPanResponderMove');
-        console.log(
-          'Location',
-          evt.nativeEvent.locationX,
-          evt.nativeEvent.locationY,
-        );
-        console.log('Move', gestureState.moveX, gestureState.moveY);
-        console.log('D', gestureState.dx, gestureState.dy);
-        // const anchor = {
-        //   x: evt.nativeEvent.locationX,
-        //   y: evt.nativeEvent.locationY,
-        // };
-        // const point = {
-        //   x: RADIUS,
-        //   y: RADIUS,
-        // };
-        // const degree = getDegree(anchor, point);
-        // console.log('Degree', degree);
-        // pan.setOffset(degree + 75);
-        pan1.setOffset({
-          x: pan1.x._value,
-          y: pan1.y._value,
+        console.log('onPanResponderMove', pan.x._value);
+        pan.setOffset({
+          x: pan.x._value,
+          y: pan.y._value,
         });
       },
       onPanResponderMove: (evt, gestureState) => {
         // The most recent move distance is gestureState.move{X,Y}
         // The accumulated gesture distance since becoming responder is
         // gestureState.d{x,y}
-        // pan.setValue({
-        //   x: gestureState.dx,
-        //   y: gestureState.dy,
-        // });
-        console.log('onPanResponderMove');
-        // console.log(
-        //   'Location',
-        //   evt.nativeEvent.locationX,
-        //   evt.nativeEvent.locationY,
-        // );
-        // console.log('Move', gestureState.moveX, gestureState.moveY);
-        // console.log('D', gestureState.dx, gestureState.dy);
-        // const anchor = {
-        //   x: evt.nativeEvent.locationX,
-        //   y: evt.nativeEvent.locationY,
-        // };
-        // const point = {
-        //   x: RADIUS,
-        //   y: RADIUS,
-        // };
-        // const degree = getDegree(anchor, point);
-        // console.log('Degree', Math.round(degree));
-        // pan.setValue(degree);
-        pan1.setValue({
+        console.log(
+          'onPanResponderMove',
+          pan.x._value,
+          JSON.stringify(gestureState, null, 2),
+        );
+        pan.setValue({
           x: gestureState.dx,
           y: gestureState.dy,
         });
@@ -111,8 +63,7 @@ export function RingPicker({
         // The user has released all touches while this view is the
         // responder. This typically means a gesture has succeeded
         console.log('onPanResponderRelease');
-        // pan.flattenOffset();
-        pan1.flattenOffset();
+        pan.flattenOffset();
       },
       onPanResponderTerminate: (evt, gestureState) => {
         // Another component has become the responder, so this gesture
@@ -149,9 +100,13 @@ export function RingPicker({
           {
             transform: [
               {
-                rotate: pan1.x.interpolate({
-                  inputRange: [-width * 2, 0, width * 2],
-                  outputRange: ['-180deg', '0deg', '180deg'],
+                rotate: pan.x.interpolate({
+                  inputRange: [-moveLimit, 0, moveLimit],
+                  outputRange: [
+                    `-${degreeLimit}deg`,
+                    '0deg',
+                    `${degreeLimit}deg`,
+                  ],
                   extrapolate: 'clamp',
                 }),
               },
@@ -160,8 +115,6 @@ export function RingPicker({
         ]}>
         {data.length > 0 &&
           data.map((item, index) => {
-            const length = data.length;
-            const degreePerItem = 360 / length;
             const transformStyle = {
               1: [
                 {
@@ -219,6 +172,63 @@ export function RingPicker({
                   translateX: index === 3 ? -width / 2 : 0,
                 },
               ],
+              5: [
+                {
+                  translateY: index === 0 ? -width / 2 : 0,
+                },
+                {
+                  translateX:
+                    index === 1
+                      ? (Math.cos(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 1
+                      ? (Math.sin(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 4
+                      ? -(Math.cos(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 4
+                      ? (Math.sin(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 2
+                      ? (Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 2
+                      ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 3
+                      ? -(Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 3
+                      ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+              ],
             };
             return (
               <Pressable
@@ -227,6 +237,8 @@ export function RingPicker({
                   position: 'absolute',
                   borderColor: 'blue',
                   borderWidth: 1,
+                  width: 50,
+                  aspectRatio: 1,
                   transform: [
                     ...transformStyle[length],
                     {
