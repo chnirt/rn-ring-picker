@@ -267,9 +267,6 @@ export function RingPicker({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
     bottom: RADIUS / 2,
   },
   titleText: {
