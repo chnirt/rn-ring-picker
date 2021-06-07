@@ -1,7 +1,14 @@
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 
-export function Neumorphism({width = 50, borderRadius = 50 / 2, children}) {
+export function Neumorphism({
+  width = 50,
+  height = 50,
+  borderRadius = 50 / 2,
+  children,
+}) {
+  const formattedWidth =
+    typeof width === 'string' ? +width.replace('%', '') / 4 : width / 4;
   return (
     <View
       style={[
@@ -9,10 +16,10 @@ export function Neumorphism({width = 50, borderRadius = 50 / 2, children}) {
         {
           shadowColor: '#000000',
           shadowOffset: {
-            width: width / 5,
-            height: width / 5,
+            width: formattedWidth,
+            height: formattedWidth,
           },
-          shadowRadius: width / 5,
+          shadowRadius: formattedWidth,
         },
       ]}>
       <Pressable
@@ -21,7 +28,7 @@ export function Neumorphism({width = 50, borderRadius = 50 / 2, children}) {
           {
             backgroundColor: '#E5E6EE',
             width,
-            aspectRatio: 1,
+            height,
             borderRadius,
             justifyContent: 'center',
             alignItems: 'center',
@@ -30,10 +37,10 @@ export function Neumorphism({width = 50, borderRadius = 50 / 2, children}) {
 
             shadowColor: '#FFFFFF',
             shadowOffset: {
-              width: -width / 5,
-              height: -width / 5,
+              width: -formattedWidth,
+              height: -formattedWidth,
             },
-            shadowRadius: width / 5,
+            shadowRadius: formattedWidth,
           },
         ]}>
         {children}
@@ -44,17 +51,8 @@ export function Neumorphism({width = 50, borderRadius = 50 / 2, children}) {
 
 const styles = StyleSheet.create({
   outer: {
-    shadowOffset: {
-      width: 12,
-      height: 12,
-    },
     shadowOpacity: 0.3,
-    shadowRadius: 12,
     elevation: 5,
   },
-  inner: {
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 5,
-  },
+  inner: {shadowOpacity: 1, elevation: 5},
 });

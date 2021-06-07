@@ -74,12 +74,6 @@ const App = () => {
   };
   const toggleCircle5 = () => console.log('END');
 
-  // return (
-  //   <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-  //     <Neumorphism />
-  //   </View>
-  // );
-
   return (
     <View style={styles.container}>
       <View
@@ -110,19 +104,32 @@ const App = () => {
         <View
           style={{
             marginTop: 20,
-            borderRadius: 10,
-            backgroundColor: '#E5E6EE',
-            minHeight: 140,
-            padding: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
           }}>
-          <Text style={{color: '#31354B', fontSize: 15, fontWeight: '400'}}>
-            Total Provision Balance
-          </Text>
-          <Text style={{color: '#31354B', fontSize: 44, fontWeight: '600'}}>
-            $12,260
-          </Text>
+          <Neumorphism
+            width="100%"
+            height={140}
+            borderRadius={10}
+            backgroundColor="#E5E6EE">
+            <View
+              style={{
+                padding: 30,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={{color: '#31354B', fontSize: 15, fontWeight: '400'}}>
+                Total Provision Balance
+              </Text>
+              <Text
+                style={{
+                  color: '#31354B',
+                  fontSize: 44,
+                  fontWeight: '600',
+                  marginTop: 15,
+                }}>
+                $12,260
+              </Text>
+            </View>
+          </Neumorphism>
         </View>
       </View>
       <View style={{flex: 1, alignItems: 'center', bottom: BUTTON_SIZE}}>
