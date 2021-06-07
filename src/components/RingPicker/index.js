@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  TouchableOpacity,
 } from 'react-native';
 
 const RADIUS = 100;
@@ -244,6 +245,8 @@ export function RingPicker({
                 key={index}
                 style={{
                   position: 'absolute',
+                  borderColor: 'red',
+                  borderWidth: 1,
                   transform: [
                     ...transformStyle[length],
                     {

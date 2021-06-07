@@ -7,7 +7,7 @@
  */
 
 import React, {useState} from 'react';
-import {StyleSheet, View, Pressable, Text} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import {RingPicker} from './src/components/RingPicker';
 import {ArrowSvg, CardSvg, MenuSvg} from './src/assets';
 import {Neumorphism} from './src/components/Neumorphism';
@@ -16,7 +16,7 @@ const BUTTON_SIZE = 82;
 const CIRCLE1_SIZE = 200;
 const CIRCLE2_SIZE = 300;
 const CIRCLE3_SIZE = 400;
-const CIRCLE4_SIZE = 500;
+const CIRCLE4_SIZE = 600;
 
 const data1 = [...Array(2).keys()];
 const data2 = [...Array(3).keys()];
@@ -76,19 +76,19 @@ const App = () => {
 
   const renderCircle4Item = ({item, index}) => {
     return (
-      <Neumorphism width={100} height={110} borderRadius={0}>
+      <Neumorphism width={100} height={110} borderRadius={12}>
         <View style={{padding: 10}}>
           <View
             style={{
               width: 36,
               height: 36,
               borderRadius: 10,
-              borderColor: '#000',
-              borderWidth: 1,
+              // borderColor: '#000',
+              // borderWidth: 1,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <CardSvg />
+            <CardSvg fill="#0861D5" />
           </View>
           <Text
             style={{
