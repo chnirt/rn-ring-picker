@@ -16,6 +16,7 @@ export function RingPicker({
   contentContainerStyle,
   data = [],
   onPress = () => {},
+  renderItem,
   children,
 }) {
   const length = data.length;
@@ -237,15 +238,12 @@ export function RingPicker({
                 },
               ],
             };
+
             return (
               <Pressable
                 key={index}
                 style={{
                   position: 'absolute',
-                  borderColor: 'blue',
-                  borderWidth: 1,
-                  width: 50,
-                  aspectRatio: 1,
                   transform: [
                     ...transformStyle[length],
                     {
@@ -254,7 +252,11 @@ export function RingPicker({
                   ],
                 }}
                 onPress={onPress}>
-                <Text>{item}</Text>
+                {typeof renderItem == 'function' ? (
+                  renderItem({item, index})
+                ) : (
+                  <Text>{item}</Text>
+                )}
               </Pressable>
             );
           })}
@@ -278,7 +280,7 @@ const styles = StyleSheet.create({
     width: RADIUS * 2,
     aspectRatio: 1,
     borderRadius: RADIUS,
-    borderWidth: 5,
+    // borderWidth: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },

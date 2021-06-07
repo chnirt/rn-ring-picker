@@ -9,7 +9,7 @@
 import React, {useState} from 'react';
 import {StyleSheet, View, Pressable, Text} from 'react-native';
 import {RingPicker} from './src/components/RingPicker';
-import {ArrowSvg, MenuSvg} from './src/assets';
+import {ArrowSvg, CardSvg, MenuSvg} from './src/assets';
 import {Neumorphism} from './src/components/Neumorphism';
 
 const BUTTON_SIZE = 82;
@@ -75,7 +75,33 @@ const App = () => {
   const toggleCircle5 = () => console.log('END');
 
   const renderCircle4Item = ({item, index}) => {
-    return <View />;
+    return (
+      <Neumorphism width={100} height={110} borderRadius={0}>
+        <View style={{padding: 10}}>
+          <View
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              borderColor: '#000',
+              borderWidth: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <CardSvg />
+          </View>
+          <Text
+            style={{
+              marginTop: 10,
+              color: '#31354B',
+              fontSize: 15,
+              fontWeight: '400',
+            }}>
+            Direct Payment
+          </Text>
+        </View>
+      </Neumorphism>
+    );
   };
 
   return (
@@ -88,7 +114,10 @@ const App = () => {
         }}>
         <View style={{position: 'absolute', left: 0}}>
           <Neumorphism>
-            <ArrowSvg fill="#717588" />
+            <View
+              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <ArrowSvg fill="#717588" />
+            </View>
           </Neumorphism>
         </View>
         <View style={{height: 50, justifyContent: 'center'}}>
@@ -162,22 +191,22 @@ const App = () => {
           data={data1}
           onPress={toggleCircle2}
         />
-        <Pressable
-          style={{
+        <Neumorphism
+          contentContainerStyles={{
             position: 'absolute',
             flex: 1,
             bottom: -BUTTON_SIZE / 2,
-            width: BUTTON_SIZE,
-            aspectRatio: 1,
             borderRadius: BUTTON_SIZE / 2,
-            borderColor: 'red',
-            borderWidth: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
           }}
+          width={BUTTON_SIZE}
+          height={BUTTON_SIZE}
+          borderRadius={BUTTON_SIZE / 2}
           onPress={toggleCircle1}>
-          <MenuSvg fill="#31354B" width={32} height={25} />
-        </Pressable>
+          <View
+            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <MenuSvg fill="#31354B" width={32} height={25} />
+          </View>
+        </Neumorphism>
       </View>
     </View>
   );

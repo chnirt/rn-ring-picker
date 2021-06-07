@@ -5,6 +5,10 @@ export function Neumorphism({
   width = 50,
   height = 50,
   borderRadius = 50 / 2,
+  contentContainerStyles,
+  borderColor = '#D9DFEA',
+  borderWidth = 1,
+  onPress = () => {},
   children,
 }) {
   const divisor = 30;
@@ -24,6 +28,7 @@ export function Neumorphism({
           },
           shadowRadius: formattedWidth,
         },
+        contentContainerStyles,
       ]}>
       <Pressable
         style={[
@@ -33,8 +38,8 @@ export function Neumorphism({
             width,
             height,
             borderRadius,
-            justifyContent: 'center',
-            alignItems: 'center',
+            borderColor,
+            borderWidth,
 
             shadowColor: '#FFFFFF',
             shadowOffset: {
@@ -43,7 +48,8 @@ export function Neumorphism({
             },
             shadowRadius: formattedWidth,
           },
-        ]}>
+        ]}
+        onPress={onPress}>
         {children}
       </Pressable>
     </View>
