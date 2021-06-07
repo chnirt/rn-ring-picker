@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
 } from 'react-native';
 
 const RADIUS = 100;
@@ -156,13 +155,13 @@ export function RingPicker({
                 },
                 {
                   translateX:
-                    index === 2
+                    index === length - 1
                       ? -(Math.cos(toRadians(degreePerItem - 90)) * width) / 2
                       : 0,
                 },
                 {
                   translateY:
-                    index === 2
+                    index === length - 1
                       ? (Math.sin(toRadians(degreePerItem - 90)) * width) / 2
                       : 0,
                 },
@@ -238,6 +237,150 @@ export function RingPicker({
                       : 0,
                 },
               ],
+              12: [
+                {
+                  translateY: index === 0 ? -width / 2 : 0,
+                },
+                {
+                  translateX:
+                    index === 1
+                      ? (Math.cos(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 1
+                      ? (Math.sin(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === length - 1
+                      ? -(Math.cos(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === length - 1
+                      ? (Math.sin(toRadians(degreePerItem - 90)) * width) / 2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 2
+                      ? (Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 2
+                      ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === length - 2
+                      ? -(Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === length - 2
+                      ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 3
+                      ? (Math.cos(toRadians(degreePerItem * 3 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 3
+                      ? (Math.sin(toRadians(degreePerItem * 3 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === length - 3
+                      ? -(Math.cos(toRadians(degreePerItem * 3 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === length - 3
+                      ? (Math.sin(toRadians(degreePerItem * 3 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 4
+                      ? (Math.cos(toRadians(degreePerItem * 4 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 4
+                      ? (Math.sin(toRadians(degreePerItem * 4 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === length - 4
+                      ? -(Math.cos(toRadians(degreePerItem * 4 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === length - 4
+                      ? (Math.sin(toRadians(degreePerItem * 4 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === 5
+                      ? (Math.cos(toRadians(degreePerItem * 5 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === 5
+                      ? (Math.sin(toRadians(degreePerItem * 5 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateX:
+                    index === length - 5
+                      ? -(Math.cos(toRadians(degreePerItem * 5 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY:
+                    index === length - 5
+                      ? (Math.sin(toRadians(degreePerItem * 5 - 90)) * width) /
+                        2
+                      : 0,
+                },
+                {
+                  translateY: index === 6 ? width / 2 : 0,
+                },
+              ],
             };
 
             return (
@@ -281,7 +424,7 @@ const styles = StyleSheet.create({
     width: RADIUS * 2,
     aspectRatio: 1,
     borderRadius: RADIUS,
-    // borderWidth: 5,
+    borderWidth: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },
