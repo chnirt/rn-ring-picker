@@ -7,8 +7,11 @@ export function Neumorphism({
   borderRadius = 50 / 2,
   children,
 }) {
+  const divisor = 30;
   const formattedWidth =
-    typeof width === 'string' ? +width.replace('%', '') / 4 : width / 4;
+    typeof width === 'string'
+      ? +width.replace('%', '') / divisor
+      : width / divisor;
   return (
     <View
       style={[
@@ -32,8 +35,6 @@ export function Neumorphism({
             borderRadius,
             justifyContent: 'center',
             alignItems: 'center',
-            borderColor: '#DDE0EB',
-            borderWidth: 1,
 
             shadowColor: '#FFFFFF',
             shadowOffset: {

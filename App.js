@@ -74,6 +74,10 @@ const App = () => {
   };
   const toggleCircle5 = () => console.log('END');
 
+  const renderCircle4Item = ({item, index}) => {
+    return <View />;
+  };
+
   return (
     <View style={styles.container}>
       <View
@@ -138,6 +142,7 @@ const App = () => {
           width={CIRCLE4_SIZE}
           data={data4}
           onPress={toggleCircle5}
+          renderItem={renderCircle4Item}
         />
         <RingPicker
           visible={visible3Circle}
