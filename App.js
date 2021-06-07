@@ -65,14 +65,19 @@ const App = () => {
     return (
       <Neumorphism width={100} height={110} borderRadius={12}>
         <View style={{padding: 10}}>
-          <Neumorphism width={36} height={36} borderRadius={10}>
+          <Neumorphism
+            type="inset"
+            width={36}
+            height={36}
+            borderRadius={10}
+            borderWidth={2}>
             <View
               style={{
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <CardSvg fill="#0861D5" />
+              <CardSvg fill="#0861D5" width={20} height={20} />
             </View>
           </Neumorphism>
           <Text
@@ -88,27 +93,6 @@ const App = () => {
       </Neumorphism>
     );
   };
-
-  const NeumorphismInset = (
-    <View
-      style={{
-        margin: 5,
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        borderColor: 'white',
-        borderWidth: 10,
-        shadowColor: 'black',
-        shadowOffset: {
-          x: -12,
-          y: -12,
-        },
-        shadowOpacity: 1,
-        shadowRadius: 20,
-        overflow: 'hidden',
-      }}
-    />
-  );
 
   return (
     <View style={styles.container}>
@@ -127,7 +111,7 @@ const App = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <ArrowSvg fill="#717588" />
+                <ArrowSvg fill="#717588" width={20} height={20} />
               </View>
             </Neumorphism>
           </Pressable>

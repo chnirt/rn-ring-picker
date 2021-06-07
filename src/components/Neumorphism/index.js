@@ -6,9 +6,10 @@ export function Neumorphism({
   height = 50,
   borderRadius = 50 / 2,
   contentContainerStyles,
-  borderColor = '#D9DFEA',
+  borderColor = '#D3DAE7',
   borderWidth = 1,
   backgroundColor = '#E5E6EE',
+  type = 'normal',
   children,
 }) {
   const divisor = 30;
@@ -16,6 +17,28 @@ export function Neumorphism({
     typeof width === 'string'
       ? +width.replace('%', '') / divisor
       : width / divisor;
+  const isInset = type === 'inset';
+  if (isInset) {
+    return (
+      <View
+        style={{
+          width: width + borderWidth,
+          height: height + borderWidth,
+          backgroundColor: 'transparent',
+          borderWidth,
+          shadowColor: '#000000',
+          borderRadius,
+          borderLeftColor: '#00000010',
+          borderTopColor: '#00000010',
+          borderRightColor: '#FFFFFF70',
+          borderBottomColor: '#FFFFFF70',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {children}
+      </View>
+    );
+  }
   return (
     <View
       style={[
