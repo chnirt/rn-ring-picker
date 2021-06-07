@@ -7,61 +7,119 @@
  */
 
 import React, {useState} from 'react';
-import {StyleSheet, View, Text, Pressable} from 'react-native';
+import {StyleSheet, View, Text, Pressable, ImageBackground} from 'react-native';
 import {RingPicker} from './src/components/RingPicker';
 import {ArrowSvg, CardSvg, MenuSvg} from './src/assets';
-import {Neumorphism} from './src/components/Neumorphism';
+import {Neumorphism} from './src/components';
+import Fan from './src/assets/icons/fan.png';
+import ActiveFan from './src/assets/icons/active-fan.png';
+import Fan1 from './src/assets/icons/fan1.png';
 
 const BUTTON_SIZE = 82;
-const CIRCLE1_SIZE = 200;
-const CIRCLE2_SIZE = 350;
+const CIRCLE1_SIZE = 190;
+const CIRCLE2_SIZE = 330;
 const CIRCLE3_SIZE = 550;
 
-const data1 = [...Array(5).keys()];
-const data2 = [...Array(5).keys()];
-const data3 = [...Array(12).keys()];
+const data1 = [
+  {id: 'data1-1', label: 'Home'},
+  {id: 'data1-2', label: 'Wealth'},
+  {id: 'data1-3', label: 'MoneySmart'},
+  {id: 'data1-4', label: 'Financial'},
+  {id: 'data1-5', label: 'Personal Goals'},
+];
+const data2 = [
+  {id: 'data2-1', label: 'WealthCLOCK Snapshot'},
+  {id: 'data2-2', label: 'WealthSPEED Snapshot'},
+  {id: 'data2-3', label: 'XXXXXXXXXX XXXXXX'},
+  {id: 'data2-4', label: 'XXXXXXXXXX XXXXXX'},
+  {id: 'data2-5', label: 'Financial Wellbeing Status'},
+];
+const data3 = [...Array(12).keys()].map((item) => ({
+  id: `data3-${item}`,
+  label: `Direct Payment ${item}`,
+}));
 
 const App = () => {
-  const [visible1Circle, setCircle1Visible] = useState(true);
-  const [visible2Circle, setCircle2Visible] = useState(true);
-  const [visible3Circle, setCircle3Visible] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [key1, setKey1] = useState();
+  const [key2, setKey2] = useState();
+  const [key3, setKey3] = useState();
 
-  const openCircle1 = () => setCircle1Visible(true);
-  const closeCircle1 = () => setCircle1Visible(false);
-  const openCircle2 = () => setCircle2Visible(true);
-  const closeCircle2 = () => setCircle2Visible(false);
-  const openCircle3 = () => setCircle3Visible(true);
-  const closeCircle3 = () => setCircle3Visible(false);
-
-  const toggleCircle1 = () => {
-    if (visible1Circle) {
-      closeCircle1();
-      closeCircle2();
-      closeCircle3();
+  const handlePress = () => {
+    if (visible) {
+      setKey1(null);
+      setKey2(null);
+      setKey3(null);
+      setVisible(false);
       return;
     }
-    openCircle1();
+    setVisible(true);
   };
-  const toggleCircle2 = () => {
-    if (visible2Circle) {
-      closeCircle2();
-      closeCircle3();
+  const toggleCircle1 = (item) => {
+    if (key1) {
+      setKey1(null);
+      setKey2(null);
+      setKey3(null);
       return;
     }
-    openCircle2();
+    setKey1(item.id);
   };
-  const toggleCircle3 = () => {
-    if (visible3Circle) {
-      closeCircle3();
+  const toggleCircle2 = (item) => {
+    if (key2) {
+      setKey2(null);
+      setKey3(null);
       return;
     }
-    openCircle3();
+    setKey2(item.id);
   };
-  const toggleCircle4 = () => console.log('END');
+  const toggleCircle3 = (item) => {
+    console.log('END');
+    if (key3) {
+      setKey3(null);
+      return;
+    }
+    setKey3(item.id);
+  };
 
   const handleBack = () => console.log('BACK');
 
-  const renderCircle3Item = ({item, index}) => {
+  const renderCircle1Item = ({item}) => {
+    return (
+      <ImageBackground
+        style={{
+          width: 150,
+          height: 90,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingBottom: 90 / 2,
+        }}
+        source={key1 === item.id ? ActiveFan : Fan}>
+        <Text style={{color: key1 === item.id ? '#FFFFFF' : '#000000'}}>
+          {item?.label}
+        </Text>
+      </ImageBackground>
+    );
+  };
+
+  const renderCircle2Item = ({item}) => {
+    return (
+      <View>
+        <ImageBackground
+          style={{
+            width: 218,
+            height: 63,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingBottom: 63 / 2,
+          }}
+          source={Fan1}>
+          <Text>{item?.label}</Text>
+        </ImageBackground>
+      </View>
+    );
+  };
+
+  const renderCircle3Item = ({item}) => {
     return (
       <Neumorphism width={100} height={110} borderRadius={12}>
         <View style={{padding: 10}}>
@@ -87,7 +145,7 @@ const App = () => {
               fontSize: 15,
               fontWeight: '400',
             }}>
-            Direct Payment {item}
+            {item?.label}
           </Text>
         </View>
       </Neumorphism>
@@ -163,23 +221,25 @@ const App = () => {
       </View>
       <View style={{flex: 1, alignItems: 'center', bottom: BUTTON_SIZE}}>
         <RingPicker
-          visible={visible3Circle}
+          visible={key2}
           width={CIRCLE3_SIZE}
           data={data3}
-          onPress={toggleCircle4}
+          onPress={toggleCircle3}
           renderItem={renderCircle3Item}
         />
         <RingPicker
-          visible={visible2Circle}
+          visible={key1}
           width={CIRCLE2_SIZE}
           data={data2}
-          onPress={toggleCircle3}
+          onPress={toggleCircle2}
+          renderItem={renderCircle2Item}
         />
         <RingPicker
-          visible={visible1Circle}
+          visible={visible}
           width={CIRCLE1_SIZE}
           data={data1}
-          onPress={toggleCircle2}
+          onPress={toggleCircle1}
+          renderItem={renderCircle1Item}
         />
         <Pressable
           style={{
@@ -188,7 +248,7 @@ const App = () => {
             bottom: -BUTTON_SIZE / 2,
             borderRadius: BUTTON_SIZE / 2,
           }}
-          onPress={toggleCircle1}>
+          onPress={handlePress}>
           <Neumorphism
             width={BUTTON_SIZE}
             height={BUTTON_SIZE}
@@ -202,12 +262,12 @@ const App = () => {
                   width: 64,
                   height: 64,
                   borderRadius: 32,
-                  backgroundColor: visible1Circle ? '#FD571F' : 'transparent',
-                  borderColor: visible1Circle ? '#CE471970' : 'transparent',
+                  backgroundColor: visible ? '#FD571F' : 'transparent',
+                  borderColor: visible ? '#CE471970' : 'transparent',
                   borderWidth: 4,
                 }}>
                 <MenuSvg
-                  fill={visible1Circle ? '#FFFFFF' : '#31354B'}
+                  fill={visible ? '#FFFFFF' : '#31354B'}
                   width={32}
                   height={25}
                 />

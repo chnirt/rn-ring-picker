@@ -395,11 +395,11 @@ export function RingPicker({
                     },
                   ],
                 }}
-                onPress={onPress}>
+                onPress={() => onPress(item)}>
                 {typeof renderItem == 'function' ? (
                   renderItem({item, index})
                 ) : (
-                  <Text>{item}</Text>
+                  <Text>{item?.label}</Text>
                 )}
               </Pressable>
             );
@@ -424,7 +424,6 @@ const styles = StyleSheet.create({
     width: RADIUS * 2,
     aspectRatio: 1,
     borderRadius: RADIUS,
-    borderWidth: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },
