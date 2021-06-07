@@ -7,7 +7,7 @@
  */
 
 import React, {useState} from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View, Text, Pressable} from 'react-native';
 import {RingPicker} from './src/components/RingPicker';
 import {ArrowSvg, CardSvg, MenuSvg} from './src/assets';
 import {Neumorphism} from './src/components/Neumorphism';
@@ -74,6 +74,8 @@ const App = () => {
   };
   const toggleCircle5 = () => console.log('END');
 
+  const handleBack = () => console.log('BACK');
+
   const renderCircle4Item = ({item, index}) => {
     return (
       <Neumorphism width={100} height={110} borderRadius={12}>
@@ -113,12 +115,18 @@ const App = () => {
           justifyContent: 'center',
         }}>
         <View style={{position: 'absolute', left: 0}}>
-          <Neumorphism>
-            <View
-              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <ArrowSvg fill="#717588" />
-            </View>
-          </Neumorphism>
+          <Pressable onPress={handleBack}>
+            <Neumorphism>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ArrowSvg fill="#717588" />
+              </View>
+            </Neumorphism>
+          </Pressable>
         </View>
         <View style={{height: 50, justifyContent: 'center'}}>
           <Text style={{color: '#31354B', fontSize: 22, fontWeight: '600'}}>
@@ -191,22 +199,24 @@ const App = () => {
           data={data1}
           onPress={toggleCircle2}
         />
-        <Neumorphism
-          contentContainerStyles={{
+        <Pressable
+          style={{
             position: 'absolute',
             flex: 1,
             bottom: -BUTTON_SIZE / 2,
             borderRadius: BUTTON_SIZE / 2,
           }}
-          width={BUTTON_SIZE}
-          height={BUTTON_SIZE}
-          borderRadius={BUTTON_SIZE / 2}
           onPress={toggleCircle1}>
-          <View
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <MenuSvg fill="#31354B" width={32} height={25} />
-          </View>
-        </Neumorphism>
+          <Neumorphism
+            width={BUTTON_SIZE}
+            height={BUTTON_SIZE}
+            borderRadius={BUTTON_SIZE / 2}>
+            <View
+              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <MenuSvg fill="#31354B" width={32} height={25} />
+            </View>
+          </Neumorphism>
+        </Pressable>
       </View>
     </View>
   );

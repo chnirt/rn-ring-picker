@@ -8,7 +8,6 @@ export function Neumorphism({
   contentContainerStyles,
   borderColor = '#D9DFEA',
   borderWidth = 1,
-  onPress = () => {},
   children,
 }) {
   const divisor = 30;
@@ -30,7 +29,7 @@ export function Neumorphism({
         },
         contentContainerStyles,
       ]}>
-      <Pressable
+      <View
         style={[
           styles.inner,
           {
@@ -48,10 +47,9 @@ export function Neumorphism({
             },
             shadowRadius: formattedWidth,
           },
-        ]}
-        onPress={onPress}>
+        ]}>
         {children}
-      </Pressable>
+      </View>
     </View>
   );
 }
