@@ -219,7 +219,7 @@ const App = () => {
           </Neumorphism>
         </View>
       </View>
-      <View style={{flex: 1, alignItems: 'center', bottom: BUTTON_SIZE}}>
+      <View style={{flex: 1, alignItems: 'center', bottom: 70}}>
         <RingPicker
           visible={key2}
           width={CIRCLE3_SIZE}
