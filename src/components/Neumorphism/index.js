@@ -1,5 +1,5 @@
 import React from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
 export function Neumorphism({
   width = 50,
@@ -8,6 +8,7 @@ export function Neumorphism({
   contentContainerStyles,
   borderColor = '#D9DFEA',
   borderWidth = 1,
+  backgroundColor = '#E5E6EE',
   children,
 }) {
   const divisor = 30;
@@ -33,7 +34,7 @@ export function Neumorphism({
         style={[
           styles.inner,
           {
-            backgroundColor: '#E5E6EE',
+            backgroundColor,
             width,
             height,
             borderRadius,

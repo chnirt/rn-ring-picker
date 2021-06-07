@@ -18,7 +18,7 @@ const CIRCLE2_SIZE = 300;
 const CIRCLE3_SIZE = 400;
 const CIRCLE4_SIZE = 600;
 
-const data1 = [...Array(2).keys()];
+const data1 = [...Array(5).keys()];
 const data2 = [...Array(3).keys()];
 const data3 = [...Array(5).keys()];
 const data4 = [...Array(4).keys()];
@@ -108,6 +108,24 @@ const App = () => {
 
   return (
     <View style={styles.container}>
+      {/* <View
+        style={{
+          margin: 5,
+          width: 200,
+          height: 200,
+          borderRadius: 100,
+          borderColor: 'white',
+          borderWidth: 10,
+          shadowColor: 'black',
+          shadowOffset: {
+            x: -12,
+            y: -12,
+          },
+          shadowOpacity: 1,
+          shadowRadius: 20,
+          overflow: 'hidden',
+        }}
+      /> */}
       <View
         style={{
           marginTop: 72,
@@ -213,7 +231,23 @@ const App = () => {
             borderRadius={BUTTON_SIZE / 2}>
             <View
               style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <MenuSvg fill="#31354B" width={32} height={25} />
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: 64,
+                  height: 64,
+                  borderRadius: 32,
+                  backgroundColor: visible1Circle ? '#FD571F' : 'transparent',
+                  borderColor: visible1Circle ? '#CE471970' : 'transparent',
+                  borderWidth: 4,
+                }}>
+                <MenuSvg
+                  fill={visible1Circle ? '#FFFFFF' : '#31354B'}
+                  width={32}
+                  height={25}
+                />
+              </View>
             </View>
           </Neumorphism>
         </Pressable>

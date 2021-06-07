@@ -245,8 +245,6 @@ export function RingPicker({
                 key={index}
                 style={{
                   position: 'absolute',
-                  borderColor: 'red',
-                  borderWidth: 1,
                   transform: [
                     ...transformStyle[length],
                     {
