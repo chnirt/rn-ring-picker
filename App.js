@@ -162,7 +162,8 @@ const App = () => {
         backgroundColor={key3 === item.id ? '#FD8C25' : '#E5E6EE'}
         width={100}
         height={110}
-        borderRadius={12}>
+        borderRadius={12}
+        borderWidth={0}>
         <View style={{padding: 10}}>
           <Neumorphism
             type="inset"
@@ -237,7 +238,8 @@ const App = () => {
             width="100%"
             height={140}
             borderRadius={10}
-            backgroundColor="#E5E6EE">
+            backgroundColor="#E5E6EE"
+            borderWidth={0}>
             <View
               style={{
                 padding: 30,
@@ -294,7 +296,8 @@ const App = () => {
           <Neumorphism
             width={BUTTON_SIZE}
             height={BUTTON_SIZE}
-            borderRadius={BUTTON_SIZE / 2}>
+            borderRadius={BUTTON_SIZE / 2}
+            borderWidth={0}>
             <View
               style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
               <View
