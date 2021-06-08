@@ -6,3 +6,5 @@ export * from './user';
 export * from './coin';
 export * from './chart';
 export * from './money';
+export * from './bag';
+export * from './bitcoin';

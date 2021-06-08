@@ -11,6 +11,8 @@ import {StyleSheet, View, Text, Pressable, ImageBackground} from 'react-native';
 import {RingPicker} from './src/components/RingPicker';
 import {
   ArrowSvg,
+  BagSvg,
+  BitCoinSvg,
   CardSvg,
   MenuSvg,
   HomeSvg,
@@ -20,8 +22,9 @@ import {
   UserSvg,
 } from './src/assets';
 import {Neumorphism} from './src/components';
-import Fan from './src/assets/icons/fan.png';
 import ActiveFan from './src/assets/icons/active-fan.png';
+import Fan from './src/assets/icons/fan.png';
+import ActiveFan1 from './src/assets/icons/active-fan1.png';
 import Fan1 from './src/assets/icons/fan1.png';
 
 const BUTTON_SIZE = 82;
@@ -43,10 +46,30 @@ const data2 = [
   {id: 'data2-4', label: 'XXXXXXXXXX XXXXXX'},
   {id: 'data2-5', label: 'Financial Wellbeing Status'},
 ];
-const data3 = [...Array(12).keys()].map((item) => ({
-  id: `data3-${item}`,
-  label: `Direct Payment ${item}`,
-}));
+const data3 = [...Array(12).keys()].map((item, index) => {
+  if (index === 0) {
+    return {
+      id: `data3-${item}`,
+      label: 'Direct Payment',
+      icon: BitCoinSvg,
+      color: '#3DB054',
+    };
+  }
+  if (index === 11) {
+    return {
+      id: `data3-${item}`,
+      label: 'Primary Accounts',
+      icon: BagSvg,
+      color: '#FD7622',
+    };
+  }
+  return {
+    id: `data3-${item}`,
+    label: 'Credit Card Jars',
+    icon: CardSvg,
+    color: '#0861D5',
+  };
+});
 
 const App = () => {
   const [visible, setVisible] = useState(false);
@@ -124,8 +147,10 @@ const App = () => {
             alignItems: 'center',
             paddingBottom: 63 / 2,
           }}
-          source={Fan1}>
-          <Text>{item?.label}</Text>
+          source={key2 === item.id ? ActiveFan1 : Fan1}>
+          <Text style={{color: key2 === item.id ? '#FFFFFF' : '#31354B'}}>
+            {item?.label}
+          </Text>
         </ImageBackground>
       </View>
     );
@@ -133,7 +158,11 @@ const App = () => {
 
   const renderCircle3Item = ({item}) => {
     return (
-      <Neumorphism width={100} height={110} borderRadius={12}>
+      <Neumorphism
+        backgroundColor={key3 === item.id ? '#FD8C25' : '#E5E6EE'}
+        width={100}
+        height={110}
+        borderRadius={12}>
         <View style={{padding: 10}}>
           <Neumorphism
             type="inset"
@@ -147,13 +176,13 @@ const App = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <CardSvg fill="#0861D5" width={20} height={20} />
+              <item.icon fill={item.color} width={20} height={20} />
             </View>
           </Neumorphism>
           <Text
             style={{
               marginTop: 10,
-              color: '#31354B',
+              color: key3 === item.id ? '#FFFFFF' : '#31354B',
               fontSize: 15,
               fontWeight: '400',
             }}>
