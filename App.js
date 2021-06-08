@@ -9,7 +9,16 @@
 import React, {useState} from 'react';
 import {StyleSheet, View, Text, Pressable, ImageBackground} from 'react-native';
 import {RingPicker} from './src/components/RingPicker';
-import {ArrowSvg, CardSvg, MenuSvg} from './src/assets';
+import {
+  ArrowSvg,
+  CardSvg,
+  MenuSvg,
+  HomeSvg,
+  CoinSvg,
+  ChartSvg,
+  MoneySvg,
+  UserSvg,
+} from './src/assets';
 import {Neumorphism} from './src/components';
 import Fan from './src/assets/icons/fan.png';
 import ActiveFan from './src/assets/icons/active-fan.png';
@@ -21,11 +30,11 @@ const CIRCLE2_SIZE = 330;
 const CIRCLE3_SIZE = 550;
 
 const data1 = [
-  {id: 'data1-1', label: 'Home'},
-  {id: 'data1-2', label: 'Wealth'},
-  {id: 'data1-3', label: 'MoneySmart'},
-  {id: 'data1-4', label: 'Financial'},
-  {id: 'data1-5', label: 'Personal Goals'},
+  {id: 'data1-1', label: 'Home', icon: HomeSvg},
+  {id: 'data1-2', label: 'Wealth', icon: CoinSvg},
+  {id: 'data1-3', label: 'MoneySmart', icon: ChartSvg},
+  {id: 'data1-4', label: 'Financial', icon: MoneySvg},
+  {id: 'data1-5', label: 'Personal Goals', icon: UserSvg},
 ];
 const data2 = [
   {id: 'data2-1', label: 'WealthCLOCK Snapshot'},
@@ -89,14 +98,17 @@ const App = () => {
         style={{
           width: 150,
           height: 90,
+          resizeMode: 'cover', // or 'stretch'
           justifyContent: 'center',
           alignItems: 'center',
-          paddingBottom: 90 / 2,
         }}
         source={key1 === item.id ? ActiveFan : Fan}>
-        <Text style={{color: key1 === item.id ? '#FFFFFF' : '#000000'}}>
+        <Text style={{color: key1 === item.id ? '#FFFFFF' : '#31354B'}}>
           {item?.label}
         </Text>
+        <View style={{marginTop: 5}}>
+          <item.icon fill={key1 === item.id ? '#FFFFFF' : '#31354B'} />
+        </View>
       </ImageBackground>
     );
   };
