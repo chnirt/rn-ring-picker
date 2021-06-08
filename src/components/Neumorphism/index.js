@@ -25,17 +25,35 @@ export function Neumorphism({
           width: width + borderWidth,
           height: height + borderWidth,
           backgroundColor: 'transparent',
+          borderColor: '#FFFFFF',
           borderWidth,
-          shadowColor: '#000000',
           borderRadius,
-          borderLeftColor: '#00000010',
-          borderTopColor: '#00000010',
-          borderRightColor: '#FFFFFF70',
-          borderBottomColor: '#FFFFFF70',
-          justifyContent: 'center',
-          alignItems: 'center',
+          shadowColor: '#ffffff',
+          shadowOpacity: 1,
+          shadowOffset: {
+            width: -2,
+            height: -2,
+          },
+          overflow: 'hidden',
         }}>
-        {children}
+        <View
+          style={{
+            width: width + borderWidth,
+            height: height + borderWidth,
+            backgroundColor: 'transparent',
+            borderColor,
+            borderWidth,
+            borderRadius,
+            shadowColor: '#00000060',
+            shadowOpacity: 1,
+            shadowOffset: {
+              width: 2,
+              height: 2,
+            },
+            overflow: 'hidden',
+          }}>
+          {children}
+        </View>
       </View>
     );
   }
