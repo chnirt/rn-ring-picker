@@ -21,7 +21,7 @@ import {
   MoneySvg,
   UserSvg,
 } from './src/assets';
-import {Neumorphism} from './src/components';
+import {CircularText, Neumorphism} from './src/components';
 import ActiveFan from './src/assets/icons/active-fan.png';
 import Fan from './src/assets/icons/fan.png';
 import ActiveFan1 from './src/assets/icons/active-fan1.png';

@@ -31,8 +31,8 @@ export function Neumorphism({
           shadowColor: '#ffffff',
           shadowOpacity: 1,
           shadowOffset: {
-            width: -2,
-            height: -2,
+            width: -1,
+            height: -1,
           },
           overflow: 'hidden',
         }}>
@@ -44,11 +44,11 @@ export function Neumorphism({
             borderColor,
             borderWidth,
             borderRadius,
-            shadowColor: '#00000060',
+            shadowColor: '#00000050',
             shadowOpacity: 1,
             shadowOffset: {
-              width: 2,
-              height: 2,
+              width: 1,
+              height: 1,
             },
             overflow: 'hidden',
           }}>
