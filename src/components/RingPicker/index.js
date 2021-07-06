@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   Animated,
   PanResponder,
@@ -15,7 +15,7 @@ export function RingPicker({
   width = RADIUS,
   contentContainerStyle,
   data = [],
-  onPress = () => {},
+  onPress = () => { },
   renderItem,
   children,
 }) {
@@ -86,7 +86,7 @@ export function RingPicker({
   }
 
   function reset() {
-    pan.setValue({x: 0, y: 0});
+    pan.setValue({ x: 0, y: 0 });
   }
 
   if (!visible) return null;
@@ -104,7 +104,7 @@ export function RingPicker({
       <Animated.View
         style={[
           styles.box,
-          {width, borderRadius: width},
+          { width, borderRadius: width },
           {
             transform: [
               {
@@ -212,28 +212,28 @@ export function RingPicker({
                   translateX:
                     index === 2
                       ? (Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === 2
                       ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === 3
                       ? -(Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === 3
                       ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
               ],
@@ -269,112 +269,112 @@ export function RingPicker({
                   translateX:
                     index === 2
                       ? (Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === 2
                       ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === length - 2
                       ? -(Math.cos(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === length - 2
                       ? (Math.sin(toRadians(degreePerItem * 2 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === 3
                       ? (Math.cos(toRadians(degreePerItem * 3 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === 3
                       ? (Math.sin(toRadians(degreePerItem * 3 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === length - 3
                       ? -(Math.cos(toRadians(degreePerItem * 3 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === length - 3
                       ? (Math.sin(toRadians(degreePerItem * 3 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === 4
                       ? (Math.cos(toRadians(degreePerItem * 4 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === 4
                       ? (Math.sin(toRadians(degreePerItem * 4 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === length - 4
                       ? -(Math.cos(toRadians(degreePerItem * 4 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === length - 4
                       ? (Math.sin(toRadians(degreePerItem * 4 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === 5
                       ? (Math.cos(toRadians(degreePerItem * 5 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === 5
                       ? (Math.sin(toRadians(degreePerItem * 5 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateX:
                     index === length - 5
                       ? -(Math.cos(toRadians(degreePerItem * 5 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
                   translateY:
                     index === length - 5
                       ? (Math.sin(toRadians(degreePerItem * 5 - 90)) * width) /
-                        2
+                      2
                       : 0,
                 },
                 {
@@ -397,7 +397,7 @@ export function RingPicker({
                 }}
                 onPress={() => onPress(item)}>
                 {typeof renderItem == 'function' ? (
-                  renderItem({item, index})
+                  renderItem({ item, index })
                 ) : (
                   <Text>{item?.label}</Text>
                 )}

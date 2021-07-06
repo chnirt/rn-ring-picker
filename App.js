@@ -6,9 +6,9 @@
  * @flow strict-local
  */
 
-import React, {useState} from 'react';
-import {StyleSheet, View, Text, Pressable, ImageBackground} from 'react-native';
-import {RingPicker} from './src/components/RingPicker';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, Pressable, ImageBackground } from 'react-native';
+import { RingPicker } from './src/components/RingPicker';
 import {
   ArrowSvg,
   BagSvg,
@@ -21,7 +21,7 @@ import {
   MoneySvg,
   UserSvg,
 } from './src/assets';
-import {CircularText, Neumorphism} from './src/components';
+import { CircularText, Neumorphism } from './src/components';
 import ActiveFan from './src/assets/icons/active-fan.png';
 import Fan from './src/assets/icons/fan.png';
 import ActiveFan1 from './src/assets/icons/active-fan1.png';
@@ -33,18 +33,18 @@ const CIRCLE2_SIZE = 330;
 const CIRCLE3_SIZE = 550;
 
 const data1 = [
-  {id: 'data1-1', label: 'Home', icon: HomeSvg},
-  {id: 'data1-2', label: 'Wealth', icon: CoinSvg},
-  {id: 'data1-3', label: 'MoneySmart', icon: ChartSvg},
-  {id: 'data1-4', label: 'Financial', icon: MoneySvg},
-  {id: 'data1-5', label: 'Personal Goals', icon: UserSvg},
+  { id: 'data1-1', label: 'Home', icon: HomeSvg },
+  { id: 'data1-2', label: 'Wealth', icon: CoinSvg },
+  { id: 'data1-3', label: 'MoneySmart', icon: ChartSvg },
+  { id: 'data1-4', label: 'Financial', icon: MoneySvg },
+  { id: 'data1-5', label: 'Personal Goals', icon: UserSvg },
 ];
 const data2 = [
-  {id: 'data2-1', label: 'WealthCLOCK Snapshot'},
-  {id: 'data2-2', label: 'WealthSPEED Snapshot'},
-  {id: 'data2-3', label: 'XXXXXXXXXX XXXXXX'},
-  {id: 'data2-4', label: 'XXXXXXXXXX XXXXXX'},
-  {id: 'data2-5', label: 'Financial Wellbeing Status'},
+  { id: 'data2-1', label: 'WealthCLOCK Snapshot' },
+  { id: 'data2-2', label: 'WealthSPEED Snapshot' },
+  { id: 'data2-3', label: 'XXXXXXXXXXXXXXXX' },
+  { id: 'data2-4', label: 'XXXXXXXXXXXXXXXX' },
+  { id: 'data2-5', label: 'Financial Wellbeing Status' },
 ];
 const data3 = [...Array(12).keys()].map((item, index) => {
   if (index === 0) {
@@ -105,7 +105,6 @@ const App = () => {
     setKey2(item.id);
   };
   const toggleCircle3 = (item) => {
-    console.log('END');
     if (key3) {
       setKey3(null);
       return;
@@ -115,7 +114,7 @@ const App = () => {
 
   const handleBack = () => console.log('BACK');
 
-  const renderCircle1Item = ({item}) => {
+  const renderCircle1Item = ({ item }) => {
     return (
       <ImageBackground
         style={{
@@ -126,37 +125,51 @@ const App = () => {
           alignItems: 'center',
         }}
         source={key1 === item.id ? ActiveFan : Fan}>
-        <Text style={{color: key1 === item.id ? '#FFFFFF' : '#31354B'}}>
+        <CircularText
+          style={{
+            position: "absolute",
+            top: 0,
+          }}
+          fill={key1 === item.id ? '#FFFFFF' : '#31354B'}
+          width={CIRCLE1_SIZE}
+          height={CIRCLE1_SIZE}
+          fontSize={12}>
           {item?.label}
-        </Text>
-        <View style={{marginTop: 5}}>
+        </CircularText>
+        <View style={{ marginTop: 5 }}>
           <item.icon fill={key1 === item.id ? '#FFFFFF' : '#31354B'} />
         </View>
       </ImageBackground>
     );
   };
 
-  const renderCircle2Item = ({item}) => {
+  const renderCircle2Item = ({ item }) => {
     return (
-      <View>
-        <ImageBackground
+      <ImageBackground
+        style={{
+          width: 218,
+          height: 63,
+          resizeMode: 'cover', // or 'stretch'
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        source={key2 === item.id ? ActiveFan1 : Fan1}>
+        <CircularText
           style={{
-            width: 218,
-            height: 63,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingBottom: 63 / 2,
+            position: "absolute",
+            top: -70 / 2
           }}
-          source={key2 === item.id ? ActiveFan1 : Fan1}>
-          <Text style={{color: key2 === item.id ? '#FFFFFF' : '#31354B'}}>
-            {item?.label}
-          </Text>
-        </ImageBackground>
-      </View>
+          fill={key2 === item.id ? '#FFFFFF' : '#31354B'}
+          width={CIRCLE2_SIZE + 70}
+          height={CIRCLE2_SIZE + 70}
+          fontSize={12}>
+          {item?.label}
+        </CircularText>
+      </ImageBackground>
     );
   };
 
-  const renderCircle3Item = ({item}) => {
+  const renderCircle3Item = ({ item }) => {
     return (
       <Neumorphism
         backgroundColor={key3 === item.id ? '#FD8C25' : '#E5E6EE'}
@@ -164,7 +177,7 @@ const App = () => {
         height={110}
         borderRadius={12}
         borderWidth={0}>
-        <View style={{padding: 10}}>
+        <View style={{ padding: 10 }}>
           <Neumorphism
             type="inset"
             width={36}
@@ -202,7 +215,7 @@ const App = () => {
           flexDirection: 'row',
           justifyContent: 'center',
         }}>
-        <View style={{position: 'absolute', left: 0}}>
+        <View style={{ position: 'absolute', left: 0 }}>
           <Pressable onPress={handleBack}>
             <Neumorphism>
               <View
@@ -216,8 +229,8 @@ const App = () => {
             </Neumorphism>
           </Pressable>
         </View>
-        <View style={{height: 50, justifyContent: 'center'}}>
-          <Text style={{color: '#31354B', fontSize: 22, fontWeight: '600'}}>
+        <View style={{ height: 50, justifyContent: 'center' }}>
+          <Text style={{ color: '#31354B', fontSize: 22, fontWeight: '600' }}>
             MoneySMART
           </Text>
         </View>
@@ -226,7 +239,7 @@ const App = () => {
         style={{
           marginTop: 64,
         }}>
-        <Text style={{color: '#31354B', fontSize: 18, fontWeight: '600'}}>
+        <Text style={{ color: '#31354B', fontSize: 18, fontWeight: '600' }}>
           Provision Jar
         </Text>
 
@@ -246,7 +259,7 @@ const App = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Text style={{color: '#31354B', fontSize: 15, fontWeight: '400'}}>
+              <Text style={{ color: '#31354B', fontSize: 15, fontWeight: '400' }}>
                 Total Provision Balance
               </Text>
               <Text
@@ -263,7 +276,7 @@ const App = () => {
         </View>
       </View>
 
-      <View style={{flex: 1, alignItems: 'center', bottom: 70}}>
+      <View style={{ flex: 1, alignItems: 'center', bottom: 70 }}>
         <RingPicker
           visible={key2}
           width={CIRCLE3_SIZE}
@@ -291,15 +304,16 @@ const App = () => {
             flex: 1,
             bottom: -BUTTON_SIZE / 2,
             borderRadius: BUTTON_SIZE / 2,
+
           }}
           onPress={handlePress}>
           <Neumorphism
             width={BUTTON_SIZE}
             height={BUTTON_SIZE}
             borderRadius={BUTTON_SIZE / 2}
-            borderWidth={0}>
+            borderWidth={visible ? 1 : 0}>
             <View
-              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <View
                 style={{
                   justifyContent: 'center',

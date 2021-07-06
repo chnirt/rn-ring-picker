@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 export function Neumorphism({
   width = 50,
@@ -25,10 +25,12 @@ export function Neumorphism({
           width: width + borderWidth,
           height: height + borderWidth,
           backgroundColor: 'transparent',
-          borderColor: '#FFFFFF',
-          borderWidth,
+          borderColor: "transparent",
+          borderRightColor: '#FFFFFF',
+          borderBottomColor: "#FFFFFF",
+          borderWidth: 1,
           borderRadius,
-          shadowColor: '#ffffff',
+          shadowColor: '#FFFFFF',
           shadowOpacity: 1,
           shadowOffset: {
             width: -1,
@@ -62,7 +64,7 @@ export function Neumorphism({
       style={[
         styles.outer,
         {
-          shadowColor: '#000000',
+          shadowColor: '#00000070',
           shadowOffset: {
             width: formattedWidth,
             height: formattedWidth,
@@ -101,5 +103,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     elevation: 5,
   },
-  inner: {shadowOpacity: 1, elevation: 5},
+  inner: { shadowOpacity: 1, elevation: 5 },
 });
