@@ -42,21 +42,22 @@ export function RingPicker({
         // The gesture has started. Show visual feedback so the user knows
         // what is happening!
         // gestureState.d{x,y} will be set to zero now
-        console.log('onPanResponderMove', pan.x._value);
+        // console.log('onPanResponderMove', pan.x._value);
         pan.setOffset({
           x: pan.x._value,
           y: pan.y._value,
         });
+        pan.setValue({ x: 0, y: 0 })
       },
       onPanResponderMove: (evt, gestureState) => {
         // The most recent move distance is gestureState.move{X,Y}
         // The accumulated gesture distance since becoming responder is
         // gestureState.d{x,y}
-        console.log(
-          'onPanResponderMove',
-          pan.x._value,
-          JSON.stringify(gestureState, null, 2),
-        );
+        // console.log(
+        //   'onPanResponderMove',
+        //   pan.x._value,
+        //   JSON.stringify(gestureState, null, 2),
+        // );
         pan.setValue({
           x: gestureState.dx,
           y: gestureState.dy,
@@ -66,7 +67,7 @@ export function RingPicker({
       onPanResponderRelease: (evt, gestureState) => {
         // The user has released all touches while this view is the
         // responder. This typically means a gesture has succeeded
-        console.log('onPanResponderRelease');
+        // console.log('onPanResponderRelease');
         pan.flattenOffset();
       },
       onPanResponderTerminate: (evt, gestureState) => {
@@ -386,15 +387,15 @@ export function RingPicker({
             return (
               <Pressable
                 key={index}
-                style={{
-                  position: 'absolute',
+                style={[styles.button, {
+
                   transform: [
                     ...transformStyle[length],
                     {
                       rotate: `${degreePerItem * index}deg`,
                     },
                   ],
-                }}
+                }]}
                 onPress={() => onPress(item)}>
                 {typeof renderItem == 'function' ? (
                   renderItem({ item, index })
@@ -427,4 +428,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  button: {
+    position: 'absolute',
+  }
 });

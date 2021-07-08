@@ -1,3 +1,3 @@
 export * from './RingPicker';
 export * from './Neumorphism';
-export * from './CircularText';
+export * from './CurvedText';

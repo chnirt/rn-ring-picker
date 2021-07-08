@@ -21,39 +21,19 @@ export function Neumorphism({
   if (isInset) {
     return (
       <View
-        style={{
+        style={[styles.insetOuter, {
           width: width + borderWidth,
           height: height + borderWidth,
-          backgroundColor: 'transparent',
-          borderColor: "transparent",
-          borderRightColor: '#FFFFFF',
-          borderBottomColor: "#FFFFFF",
-          borderWidth: 1,
           borderRadius,
-          shadowColor: '#FFFFFF',
-          shadowOpacity: 1,
-          shadowOffset: {
-            width: -1,
-            height: -1,
-          },
-          overflow: 'hidden',
-        }}>
+        }]}>
         <View
-          style={{
+          style={[styles.insetInner, {
             width: width + borderWidth,
             height: height + borderWidth,
-            backgroundColor: 'transparent',
             borderColor,
             borderWidth,
             borderRadius,
-            shadowColor: '#00000050',
-            shadowOpacity: 1,
-            shadowOffset: {
-              width: 1,
-              height: 1,
-            },
-            overflow: 'hidden',
-          }}>
+          }]}>
           {children}
         </View>
       </View>
@@ -104,4 +84,28 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   inner: { shadowOpacity: 1, elevation: 5 },
+  insetOuter: {
+    backgroundColor: 'transparent',
+    borderColor: "transparent",
+    borderRightColor: '#FFFFFF',
+    borderBottomColor: "#FFFFFF",
+    borderWidth: 1,
+    shadowColor: '#FFFFFF',
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: -1,
+      height: -1,
+    },
+    overflow: 'hidden',
+  },
+  insetInner: {
+    backgroundColor: 'transparent',
+    shadowColor: '#00000050',
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    overflow: 'hidden',
+  }
 });

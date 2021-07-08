@@ -1,18 +1,13 @@
 import React from 'react';
-import { Text } from 'react-native';
 import Svg, {
   Circle,
   Text as SvgText,
   TextPath,
   TSpan,
   G,
-  Line,
-  Rect,
-  Defs,
-  Path,
 } from 'react-native-svg';
 
-export function CircularText(props) {
+export function CurvedText(props) {
   const {
     fill = '#000',
     width = 100,
