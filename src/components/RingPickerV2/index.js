@@ -4,7 +4,7 @@ import {View, Text, Pressable, Animated, PanResponder} from 'react-native';
 export function RingPickerV2({
   data = [],
   size = 200,
-  elementHeight = 50,
+  elementSize = 50,
   rect = 'top',
   onPress = () => {},
   onMomentumScrollEnd = () => {},
@@ -110,40 +110,75 @@ export function RingPickerV2({
                 [rects[rect]]: -size / 2,
                 borderColor: 'orange',
                 borderWidth: 1,
-                height: elementHeight,
-                width: elementHeight,
-                borderRadius: elementHeight / 2,
+                height: elementSize,
+                width: elementSize,
+                borderRadius: elementSize / 2,
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
               onPress={() => {
                 const ithCircleValue = -index * deltaTheta * pxPerDeg;
+                // const ithCircleValue = getIthCircleValue(0, pan);
+                // const isFirst = index === 0;
+                // const isLast = index === data.length - 1;
                 // setPrevStep(index);
-                // if (prevStep === index) {
+                // // if (index > data.length / 2) {
+                // //   console.log('>');
+                // // } else {
+                // //   console.log('<');
+                // // }
+                // console.log(index, ithCircleValue, deltaTheta * pxPerDeg);
+                // if (isFirst) {
+                //   pan.setValue(0);
+                //   if (prevStep === 1) {
+                //     return;
+
+                //     // console.log(
+                //     //   'prevStep === 1👾',
+                //     //   index,
+                //     //   ithCircleValue,
+                //     //   deltaTheta * pxPerDeg,
+                //     // );
+                //     // Animated.timing(pan, {
+                //     //   toValue: 0,
+                //     //   useNativeDriver: false,
+                //     // }).start(() => {
+                //     //   // pan.setValue(0);
+                //     // });
+                //     // return;
+                //   }
+                //   // pan.setValue(0);
                 //   return;
+                //   //   // console.log(
+                //   //   //   'prevStep !== 1👾',
+                //   //   //   index,
+                //   //   //   ithCircleValue,
+                //   //   //   deltaTheta * pxPerDeg,
+                //   //   // );
+                //   //   Animated.timing(pan, {
+                //   //     toValue: -600,
+                //   //     useNativeDriver: false,
+                //   //   }).start(() => {
+                //   //     pan.setValue(0);
+                //   //   });
+                //   //   return;
                 // }
-                console.log(index, ithCircleValue);
-                // if (index === 0) {
-                //   Animated.spring(pan, {
-                //     toValue: -600,
-                //     friction: 5,
-                //     tension: 10,
-                //     useNativeDriver: false,
-                //   }).start(() => {
-                //     pan.setValue(0);
-                //   });
-                //   return;
-                // }
-                // if (index === data.length - 1 && ithCircleValue === -480) {
-                //   Animated.spring(pan, {
-                //     toValue: 120,
-                //     friction: 5,
-                //     tension: 10,
-                //     useNativeDriver: false,
-                //   }).start(() => {
-                //     pan.setValue(600);
-                //   });
-                //   return;
+                // if (isLast && prevStep === 0) {
+                //   pan.setValue(-550);
+                //   // return;
+                //   //   // console.log(
+                //   //   //   'index === data.length - 1 && prevStep === 0👾',
+                //   //   //   index,
+                //   //   //   ithCircleValue,
+                //   //   //   deltaTheta * pxPerDeg,
+                //   //   // );
+                //   //   Animated.timing(pan, {
+                //   //     toValue: deltaTheta * pxPerDeg,
+                //   //     useNativeDriver: false,
+                //   //   }).start(() => {
+                //   //     pan.setValue(ithCircleValue);
+                //   //   });
+                //   //   return;
                 // }
                 Animated.timing(pan, {
                   toValue: ithCircleValue,
