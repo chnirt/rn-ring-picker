@@ -8,17 +8,7 @@ import {CircleBlueGradient} from './components/CircleBlueGradient';
 import {CircleTouchable} from './components/CircleTouchable';
 import {SwipeArrowHint} from './icons/SwipeArrowHint';
 import {Circle} from './icons/Circle';
-import {debounce} from 'lodash';
-import {RingPicker} from '../RingPicker';
-
-const CIRCLE1_SIZE = 190;
-const data1 = [
-  {id: 'data2-1', label: 'WealthCLOCK Snapshot'},
-  {id: 'data2-2', label: 'WealthSPEED Snapshot'},
-  {id: 'data2-3', label: 'XXXXXXXXXXXXXXXX'},
-  {id: 'data2-4', label: 'XXXXXXXXXXXXXXXX'},
-  {id: 'data2-5', label: 'Financial Wellbeing Status'},
-];
+import {debounce} from 'debounce';
 
 export default class ReactNativeRingPicker extends React.Component {
   static DEFAULT_ICON = (color) => <Circle color={color} />;
@@ -40,12 +30,7 @@ export default class ReactNativeRingPicker extends React.Component {
     onPress: (iconId) => {},
     girthAngle: 120,
     iconHideOnTheBackDuration: 250,
-    icons: [
-      {id: 'action_1', title: 'action_1'},
-      'action_2',
-      'action_3',
-      'action_4',
-    ],
+    icons: ['1', '2', '3', '4', '5'],
     showArrowHint: true,
     style: {},
     styleIconText: {},
@@ -80,7 +65,7 @@ export default class ReactNativeRingPicker extends React.Component {
     this.ICON_POSITION_ANGLE = this.GIRTH_ANGLE / this.AMOUNT_OF_ICONS;
 
     // 2*π*r / 360
-    this.STEP_LENGTH_TO_1_ANGLE = 0;
+    this.STEP_LENGTH_TO_1_ANGLE = 1;
 
     this.DIRECTIONS = {
       CLOCKWISE: 'CLOCKWISE',
@@ -128,6 +113,7 @@ export default class ReactNativeRingPicker extends React.Component {
       onPanResponderMove: (e, gestureState) => {
         this.defineCurrentSection(gestureState.moveX, gestureState.moveY);
         this.checkPreviousDifferenceLengths(gestureState.dx, gestureState.dy);
+
         this.state.pan.setValue(this.CURRENT_VECTOR_DIFFERENCE_LENGTH);
         this.setState(
           {
@@ -136,18 +122,21 @@ export default class ReactNativeRingPicker extends React.Component {
               this.CURRENT_VECTOR_DIFFERENCE_LENGTH /
               this.STEP_LENGTH_TO_1_ANGLE,
           },
-          // () => {
-          //   // this.calculateIconCurrentPositions(gestureState.vx);
-          // },
+          () => {
+            this.calculateIconCurrentPositions(gestureState.vx);
+          },
         );
       },
-      // onPanResponderRelease: (evt, gestureState) => {
-      //   // let lastGesture = {...gestureState};
-      //   // this.createFinishAnimationPromisesAndResolveIfIconsAreNotMovingAlready();
-      //   // Promise.all(this.getFinishAnimationPromises()).then(() => {
-      //   //   this.snapNearestIconToVerticalAxis(lastGesture);
-      //   // });
-      // },
+      onPanResponderRelease: (evt, gestureState) => {
+        let lastGesture = {...gestureState};
+
+        // this.createFinishAnimationPromisesAndResolveIfIconsAreNotMovingAlready();
+        this.snapNearestIconToVerticalAxis(lastGesture);
+
+        // Promise.all(this.getFinishAnimationPromises()).then(() =>
+        //   this.snapNearestIconToVerticalAxis(lastGesture),
+        // );
+      },
     });
   }
 
@@ -172,168 +161,168 @@ export default class ReactNativeRingPicker extends React.Component {
     });
   }
 
-  // snapNearestIconToVerticalAxis(lastGesture) {
-  //   let {
-  //     minDistanceToVerticalAxis,
-  //     minDistanceToHorizontalAxis,
-  //     sign,
-  //     currentSnappedIcon,
-  //   } = this.getMinDistanceToVerticalAxisAndSnappedIcon();
-  //   [minDistanceToVerticalAxis, minDistanceToHorizontalAxis] =
-  //     this.updateMinimalDistanceExponentialDeflection(
-  //       minDistanceToVerticalAxis,
-  //       minDistanceToHorizontalAxis,
-  //       currentSnappedIcon,
-  //     );
+  snapNearestIconToVerticalAxis(lastGesture) {
+    let {
+      minDistanceToVerticalAxis,
+      minDistanceToHorizontalAxis,
+      sign,
+      currentSnappedIcon,
+    } = this.getMinDistanceToVerticalAxisAndSnappedIcon();
+    // [minDistanceToVerticalAxis, minDistanceToHorizontalAxis] =
+    //   this.updateMinimalDistanceExponentialDeflection(
+    //     minDistanceToVerticalAxis,
+    //     minDistanceToHorizontalAxis,
+    //     currentSnappedIcon,
+    //   );
 
-  //   this.updateCurrentDirectionBasedOnNearestIconPosition(sign);
-  //   this.setAdditiveMovementLength(
-  //     sign * minDistanceToVerticalAxis,
-  //     -minDistanceToHorizontalAxis,
-  //   );
-  //   this.setPreviousDifferenceLengths(
-  //     lastGesture.dx + sign * minDistanceToVerticalAxis,
-  //     lastGesture.dy + minDistanceToHorizontalAxis,
-  //   );
-  //   this.animateAllIconsToMatchVerticalAxis(currentSnappedIcon);
-  // }
+    this.updateCurrentDirectionBasedOnNearestIconPosition(sign);
+    this.setAdditiveMovementLength(
+      sign * minDistanceToVerticalAxis,
+      -minDistanceToHorizontalAxis,
+    );
+    // this.setPreviousDifferenceLengths(
+    //   lastGesture.dx + sign * minDistanceToVerticalAxis,
+    //   lastGesture.dy + minDistanceToHorizontalAxis,
+    // );
+    this.animateAllIconsToMatchVerticalAxis(currentSnappedIcon);
+  }
 
-  // getMinDistanceToVerticalAxisAndSnappedIcon() {
-  //   let minDistanceToVerticalAxis = this.STEP_LENGTH_TO_1_ANGLE * 360;
-  //   let minDistanceToHorizontalAxis = this.STEP_LENGTH_TO_1_ANGLE * 360;
-  //   let sign = 1;
-  //   let currentSnappedIcon = null;
-  //   let yCoordinateFromCssStyling =
-  //     STYLES.iconContainer.top - SQUARE_DIMENSIONS.ICON_PADDING_FROM_WHEEL;
+  getMinDistanceToVerticalAxisAndSnappedIcon() {
+    let minDistanceToVerticalAxis = this.STEP_LENGTH_TO_1_ANGLE * 360;
+    let minDistanceToHorizontalAxis = this.STEP_LENGTH_TO_1_ANGLE * 360;
+    let sign = 1;
+    let currentSnappedIcon = null;
+    let yCoordinateFromCssStyling =
+      STYLES.iconContainer.top - SQUARE_DIMENSIONS.ICON_PADDING_FROM_WHEEL;
 
-  //   this.state.icons.forEach((icon) => {
-  //     let iconXCenterCoordinate =
-  //       icon.position.x.__getValue() + STYLES.icon.width / 2;
-  //     let iconYCenterCoordinate = icon.position.y.__getValue();
+    this.state.icons.forEach((icon) => {
+      let iconXCenterCoordinate =
+        icon.position.x.__getValue() + STYLES.icon.width / 2;
+      let iconYCenterCoordinate = icon.position.y.__getValue();
 
-  //     let distanceToXAxis = Math.abs(
-  //       iconXCenterCoordinate -
-  //         (this.state.XY_AXES_COORDINATES.X -
-  //           this.state.XY_AXES_COORDINATES.PAGE_X),
-  //     );
-  //     let distanceToYAxis = Math.abs(
-  //       yCoordinateFromCssStyling - iconYCenterCoordinate,
-  //     );
+      let distanceToXAxis = Math.abs(
+        iconXCenterCoordinate -
+          (this.state.XY_AXES_COORDINATES.X -
+            this.state.XY_AXES_COORDINATES.PAGE_X),
+      );
+      let distanceToYAxis = Math.abs(
+        yCoordinateFromCssStyling - iconYCenterCoordinate,
+      );
 
-  //     if (distanceToYAxis <= minDistanceToHorizontalAxis) {
-  //       minDistanceToHorizontalAxis = distanceToYAxis;
-  //     }
+      if (distanceToYAxis <= minDistanceToHorizontalAxis) {
+        minDistanceToHorizontalAxis = distanceToYAxis;
+      }
 
-  //     if (distanceToXAxis <= minDistanceToVerticalAxis) {
-  //       if (
-  //         iconXCenterCoordinate >
-  //         this.state.XY_AXES_COORDINATES.X -
-  //           this.state.XY_AXES_COORDINATES.PAGE_X
-  //       ) {
-  //         sign = -1;
-  //       } else if (
-  //         iconXCenterCoordinate <
-  //         this.state.XY_AXES_COORDINATES.X -
-  //           this.state.XY_AXES_COORDINATES.PAGE_X
-  //       ) {
-  //         sign = 1;
-  //       } else {
-  //         sign = 0;
-  //         minDistanceToVerticalAxis = 0;
-  //       }
-  //       minDistanceToVerticalAxis = distanceToXAxis;
-  //       currentSnappedIcon = icon;
-  //     }
-  //   });
+      if (distanceToXAxis <= minDistanceToVerticalAxis) {
+        if (
+          iconXCenterCoordinate >
+          this.state.XY_AXES_COORDINATES.X -
+            this.state.XY_AXES_COORDINATES.PAGE_X
+        ) {
+          sign = -1;
+        } else if (
+          iconXCenterCoordinate <
+          this.state.XY_AXES_COORDINATES.X -
+            this.state.XY_AXES_COORDINATES.PAGE_X
+        ) {
+          sign = 1;
+        } else {
+          sign = 0;
+          minDistanceToVerticalAxis = 0;
+        }
+        minDistanceToVerticalAxis = distanceToXAxis;
+        currentSnappedIcon = icon;
+      }
+    });
 
-  //   return {
-  //     minDistanceToVerticalAxis,
-  //     minDistanceToHorizontalAxis,
-  //     sign,
-  //     currentSnappedIcon,
-  //   };
-  // }
+    return {
+      minDistanceToVerticalAxis,
+      minDistanceToHorizontalAxis,
+      sign,
+      currentSnappedIcon,
+    };
+  }
 
-  // updateCurrentDirectionBasedOnNearestIconPosition(sign) {
-  //   if (sign > 0) {
-  //     this.CURRENT_DIRECTION = this.DIRECTIONS.CLOCKWISE;
-  //   } else {
-  //     this.CURRENT_DIRECTION = this.DIRECTIONS.COUNTERCLOCKWISE;
-  //   }
-  // }
+  updateCurrentDirectionBasedOnNearestIconPosition(sign) {
+    if (sign > 0) {
+      this.CURRENT_DIRECTION = this.DIRECTIONS.CLOCKWISE;
+    } else {
+      this.CURRENT_DIRECTION = this.DIRECTIONS.COUNTERCLOCKWISE;
+    }
+  }
 
-  // adjustMinimalExponentialDistanceCorrection(angle, minV, minH) {
-  //   if (!this.props.isExpDistCorrection) {
-  //     return [minV, minH];
-  //   }
+  adjustMinimalExponentialDistanceCorrection(angle, minV, minH) {
+    if (!this.props.isExpDistCorrection) {
+      return [minV, minH];
+    }
 
-  //   let currentAngle = Math.round(angle);
-  //   let lowestBoundaryDegree = 270 - this.props.noExpDistCorrectionDegree;
-  //   let highestBoundaryDegree = 270 + this.props.noExpDistCorrectionDegree;
+    let currentAngle = Math.round(angle);
+    let lowestBoundaryDegree = 270 - this.props.noExpDistCorrectionDegree;
+    let highestBoundaryDegree = 270 + this.props.noExpDistCorrectionDegree;
 
-  //   if (
-  //     currentAngle < lowestBoundaryDegree ||
-  //     currentAngle > highestBoundaryDegree
-  //   ) {
-  //     let number =
-  //       (15 - 0.004165 * Math.pow(currentAngle - 270, 2)) *
-  //       this.STEP_LENGTH_TO_1_ANGLE;
+    if (
+      currentAngle < lowestBoundaryDegree ||
+      currentAngle > highestBoundaryDegree
+    ) {
+      let number =
+        (15 - 0.004165 * Math.pow(currentAngle - 270, 2)) *
+        this.STEP_LENGTH_TO_1_ANGLE;
 
-  //     return [minV - number, minH - Math.sqrt(number) / 2];
-  //   }
+      return [minV - number, minH - Math.sqrt(number) / 2];
+    }
 
-  //   return [minV, minH];
-  // }
+    return [minV, minH];
+  }
 
   /**
    * if current angle is lower than 270 center angle minus 15 degrees gap, that implies parabolic distance
    * from this. 30 degrees center gap - adjust minimal distance to vertical axis regarding this parabolic distance
    */
-  // updateMinimalDistanceExponentialDeflection(
-  //   minDistanceToVerticalAxis,
-  //   minDistanceToHorizontalAxis,
-  //   currentSnappedIcon,
-  // ) {
-  //   const id = currentSnappedIcon.id;
-  //   const index = currentSnappedIcon.index;
+  updateMinimalDistanceExponentialDeflection(
+    minDistanceToVerticalAxis,
+    minDistanceToHorizontalAxis,
+    currentSnappedIcon,
+  ) {
+    const id = currentSnappedIcon.id;
+    const index = currentSnappedIcon.index;
 
-  //   let minV = minDistanceToVerticalAxis;
-  //   let minH = minDistanceToHorizontalAxis;
+    let minV = minDistanceToVerticalAxis;
+    let minH = minDistanceToHorizontalAxis;
 
-  //   let currentAngle =
-  //     270 +
-  //     this.state.CURRENT_ICON_SHIFT +
-  //     (this.INDEX_EXTRACTORS[id] || 0) +
-  //     index * this.ICON_POSITION_ANGLE;
+    let currentAngle =
+      270 +
+      this.state.CURRENT_ICON_SHIFT +
+      (this.INDEX_EXTRACTORS[id] || 0) +
+      index * this.ICON_POSITION_ANGLE;
 
-  //   [minV, minH] = this.adjustMinimalExponentialDistanceCorrection(
-  //     currentAngle,
-  //     minV,
-  //     minH,
-  //   );
+    [minV, minH] = this.adjustMinimalExponentialDistanceCorrection(
+      currentAngle,
+      minV,
+      minH,
+    );
 
-  //   return [minV, minH];
-  // }
+    return [minV, minH];
+  }
 
-  // animateAllIconsToMatchVerticalAxis(currentSnappedIcon) {
-  //   Animated.spring(this.state.pan, {
-  //     toValue: this.CURRENT_VECTOR_DIFFERENCE_LENGTH,
-  //     easing: Easing.linear,
-  //     speed: 12,
-  //     // useNativeDriver: true // if this is used - the last click after previous release will twist back nad forward
-  //   }).start();
-  //   this.setState(
-  //     {
-  //       ...this.state,
-  //       CURRENT_ICON_SHIFT:
-  //         this.CURRENT_VECTOR_DIFFERENCE_LENGTH / this.STEP_LENGTH_TO_1_ANGLE,
-  //       currentSnappedIcon: currentSnappedIcon,
-  //     },
-  //     () => {
-  //       this.calculateIconCurrentPositions();
-  //     },
-  //   );
-  // }
+  animateAllIconsToMatchVerticalAxis(currentSnappedIcon) {
+    Animated.spring(this.state.pan, {
+      toValue: this.CURRENT_VECTOR_DIFFERENCE_LENGTH,
+      easing: Easing.linear,
+      speed: 12,
+      // useNativeDriver: true // if this is used - the last click after previous release will twist back nad forward
+    }).start();
+    this.setState(
+      {
+        ...this.state,
+        CURRENT_ICON_SHIFT:
+          this.CURRENT_VECTOR_DIFFERENCE_LENGTH / this.STEP_LENGTH_TO_1_ANGLE,
+        // currentSnappedIcon: currentSnappedIcon,
+      },
+      () => {
+        // this.calculateIconCurrentPositions();
+      },
+    );
+  }
 
   /**
    * "some icon"
@@ -438,16 +427,19 @@ export default class ReactNativeRingPicker extends React.Component {
     ];
   }
 
-  // goToCurrentFocusedPage = () => {
-  //   this.state.currentSnappedIcon &&
-  //     this.props.onPress(this.state.currentSnappedIcon.id);
-  // };
+  goToCurrentFocusedPage = () => {
+    this.state.currentSnappedIcon &&
+      this.props.onPress(this.state.currentSnappedIcon.id);
+  };
 
   defineAxesCoordinatesOnLayoutDisplacement = () => {
     this._wheelNavigator.measure((x, y, width, height, pageX, pageY) => {
       this.setState({
         ...this.state,
-        ICON_PATH_RADIUS: height / 2,
+        ICON_PATH_RADIUS:
+          height / 2 +
+          STYLES.icon.height / 2 +
+          SQUARE_DIMENSIONS.ICON_PADDING_FROM_WHEEL,
         XY_AXES_COORDINATES: {
           X: pageX + width / 2,
           Y: pageY + height / 2,
@@ -458,7 +450,7 @@ export default class ReactNativeRingPicker extends React.Component {
       this.STEP_LENGTH_TO_1_ANGLE =
         (2 * Math.PI * this.state.ICON_PATH_RADIUS) / 360;
 
-      // this.calculateIconCurrentPositions();
+      this.calculateIconCurrentPositions();
     });
   };
 
@@ -599,185 +591,165 @@ export default class ReactNativeRingPicker extends React.Component {
     }
   }
 
-  // adjustCurrentIconAngleExponentially(angle) {
-  //   let currentIconAngle = Math.round(angle);
+  adjustCurrentIconAngleExponentially(angle) {
+    let currentIconAngle = Math.round(angle);
 
-  //   if (!this.props.isExpDistCorrection) {
-  //     return currentIconAngle;
-  //   }
+    if (!this.props.isExpDistCorrection) {
+      return currentIconAngle;
+    }
 
-  //   let lowestBoundaryDegree = 270 - this.props.noExpDistCorrectionDegree;
-  //   let highestBoundaryDegree = 270 + this.props.noExpDistCorrectionDegree;
+    let lowestBoundaryDegree = 270 - this.props.noExpDistCorrectionDegree;
+    let highestBoundaryDegree = 270 + this.props.noExpDistCorrectionDegree;
 
-  //   if (currentIconAngle < lowestBoundaryDegree) {
-  //     return (
-  //       currentIconAngle - (15 - 0.004165 * Math.pow(currentIconAngle - 270, 2))
-  //     );
-  //   } else if (currentIconAngle > highestBoundaryDegree) {
-  //     return (
-  //       currentIconAngle + (15 - 0.004165 * Math.pow(currentIconAngle - 270, 2))
-  //     );
-  //   } else {
-  //     return currentIconAngle;
-  //   }
-  // }
+    if (currentIconAngle < lowestBoundaryDegree) {
+      return (
+        currentIconAngle - (15 - 0.004165 * Math.pow(currentIconAngle - 270, 2))
+      );
+    } else if (currentIconAngle > highestBoundaryDegree) {
+      return (
+        currentIconAngle + (15 - 0.004165 * Math.pow(currentIconAngle - 270, 2))
+      );
+    } else {
+      return currentIconAngle;
+    }
+  }
 
-  // calculateIconCurrentPosition(icon) {
-  //   let currentIconAngle = this.calculateCurrentIconAngle(icon);
-  //   // the Y coordinate where the center of the circle is higher than the coordinates of Icons, this is actually similar {+X:-Y} section of coordinate net
-  //   // and INVERTED, this is basically if we'd have an upside-down screen always
+  calculateIconCurrentPosition(icon) {
+    let currentIconAngle = this.calculateCurrentIconAngle(icon);
+    // the Y coordinate where the center of the circle is higher than the coordinates of Icons, this is actually similar {+X:-Y} section of coordinate net
+    // and INVERTED, this is basically if we'd have an upside-down screen always
 
-  //   // console.log(10 - 0.00277 * Math.pow((currentIconAngle - 270), 2));
-  //   // console.log(20 - 0.00666 * Math.pow((currentIconAngle - 270), 2));
-  //   // console.log(15 - 0.005 * Math.pow((currentIconAngle - 270), 2));
-  //   // this is necessary deviation since angle sometimes would be 269.931793549246 or 270.002727265348 degrees
-  //   /**
-  //    * y=15-1/200*(x-270)^2
-  //    *
-  //    * this parabolic gap matches the maximum value of 15 degrees for the angle interval of {-60°:60°}, -270° shift makes it possible to calculate the gap for X interval of {210°:330°}
-  //    *
-  //    * this is parabolic acceleration, basically - further the position from 270 degrees - more would be the gap from the vertical axis - thus creating the distance from center aligned icon
-  //    */
-  //   currentIconAngle =
-  //     this.adjustCurrentIconAngleExponentially(currentIconAngle);
+    // console.log(10 - 0.00277 * Math.pow((currentIconAngle - 270), 2));
+    // console.log(20 - 0.00666 * Math.pow((currentIconAngle - 270), 2));
+    // console.log(15 - 0.005 * Math.pow((currentIconAngle - 270), 2));
+    // this is necessary deviation since angle sometimes would be 269.931793549246 or 270.002727265348 degrees
+    /**
+     * y=15-1/200*(x-270)^2
+     *
+     * this parabolic gap matches the maximum value of 15 degrees for the angle interval of {-60°:60°}, -270° shift makes it possible to calculate the gap for X interval of {210°:330°}
+     *
+     * this is parabolic acceleration, basically - further the position from 270 degrees - more would be the gap from the vertical axis - thus creating the distance from center aligned icon
+     */
+    currentIconAngle =
+      this.adjustCurrentIconAngleExponentially(currentIconAngle);
 
-  //   return {
-  //     top:
-  //       this.state.XY_AXES_COORDINATES.Y -
-  //       this.state.XY_AXES_COORDINATES.PAGE_Y +
-  //       this.state.ICON_PATH_RADIUS *
-  //         Math.sin(currentIconAngle * (Math.PI / 180)),
-  //     left:
-  //       this.state.XY_AXES_COORDINATES.X -
-  //       this.state.XY_AXES_COORDINATES.PAGE_X -
-  //       STYLES.icon.width / 2 +
-  //       this.state.ICON_PATH_RADIUS *
-  //         Math.cos(currentIconAngle * (Math.PI / 180)),
-  //   };
-  // }
+    return {
+      top:
+        this.state.XY_AXES_COORDINATES.Y -
+        this.state.XY_AXES_COORDINATES.PAGE_Y +
+        this.state.ICON_PATH_RADIUS *
+          Math.sin(currentIconAngle * (Math.PI / 180)),
+      left:
+        this.state.XY_AXES_COORDINATES.X -
+        this.state.XY_AXES_COORDINATES.PAGE_X -
+        STYLES.icon.width / 2 +
+        this.state.ICON_PATH_RADIUS *
+          Math.cos(currentIconAngle * (Math.PI / 180)),
+    };
+  }
 
-  // calculateCurrentIconAngle(icon) {
-  //   const id = icon.id;
-  //   const index = icon.index;
+  calculateCurrentIconAngle(icon) {
+    const id = icon.id;
+    const index = icon.index;
 
-  //   if (!this.INDEX_EXTRACTORS[id]) {
-  //     this.INDEX_EXTRACTORS[id] = 0;
-  //   }
+    if (!this.INDEX_EXTRACTORS[id]) {
+      this.INDEX_EXTRACTORS[id] = 0;
+    }
 
-  //   let currentAngle =
-  //     270 +
-  //     this.state.CURRENT_ICON_SHIFT +
-  //     this.INDEX_EXTRACTORS[id] +
-  //     index * this.ICON_POSITION_ANGLE;
+    let currentAngle =
+      270 +
+      this.state.CURRENT_ICON_SHIFT +
+      this.INDEX_EXTRACTORS[id] +
+      index * this.ICON_POSITION_ANGLE;
 
-  //   if (currentAngle < 270 - this.GIRTH_ANGLE / 2) {
-  //     this.hideIconWhileMovingBehindCircle(id);
-  //     this.INDEX_EXTRACTORS[id] += this.GIRTH_ANGLE;
-  //     return currentAngle + this.GIRTH_ANGLE;
-  //   }
+    if (currentAngle < 270 - this.GIRTH_ANGLE / 2) {
+      this.hideIconWhileMovingBehindCircle(id);
+      this.INDEX_EXTRACTORS[id] += this.GIRTH_ANGLE;
+      return currentAngle + this.GIRTH_ANGLE;
+    }
 
-  //   if (currentAngle > 270 + this.GIRTH_ANGLE / 2) {
-  //     this.hideIconWhileMovingBehindCircle(id);
-  //     this.INDEX_EXTRACTORS[id] -= this.GIRTH_ANGLE;
-  //     return currentAngle - this.GIRTH_ANGLE;
-  //   }
+    if (currentAngle > 270 + this.GIRTH_ANGLE / 2) {
+      this.hideIconWhileMovingBehindCircle(id);
+      this.INDEX_EXTRACTORS[id] -= this.GIRTH_ANGLE;
+      return currentAngle - this.GIRTH_ANGLE;
+    }
 
-  //   return currentAngle;
-  // }
+    return currentAngle;
+  }
 
-  // calculateIconCurrentPositions(dx) {
-  //   function extractCorrectRestDisplacementThreshold(dx) {
-  //     if (!dx || ((dx) => 0 && dx <= 1)) {
-  //       return 1;
-  //     }
+  calculateIconCurrentPositions(dx) {
+    function extractCorrectRestDisplacementThreshold(dx) {
+      if (!dx || ((dx) => 0 && dx <= 1)) {
+        return 1;
+      }
 
-  //     return 10;
-  //   }
+      return 10;
+    }
 
-  //   this.state.icons.forEach((icon) => {
-  //     let coordinates = this.calculateIconCurrentPosition(icon);
+    this.state.icons.forEach((icon) => {
+      let coordinates = this.calculateIconCurrentPosition(icon);
 
-  //     Animated.spring(icon.position, {
-  //       toValue: {
-  //         x: coordinates.left,
-  //         y: coordinates.top,
-  //       },
-  //       easing: Easing.linear,
-  //       speed: 30,
-  //       restSpeedThreshold: 10,
-  //       bounciness: 0,
-  //       restDisplacementThreshold: extractCorrectRestDisplacementThreshold(dx),
-  //     }).start((finish) => {
-  //       return (
-  //         finish.finished &&
-  //         typeof this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] ===
-  //           'function' &&
-  //         this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id]()
-  //       );
-  //     });
-  //   });
-  // }
+      Animated.spring(icon.position, {
+        toValue: {
+          x: coordinates.left,
+          y: coordinates.top,
+        },
+        easing: Easing.linear,
+        speed: 30,
+        restSpeedThreshold: 10,
+        bounciness: 0,
+        restDisplacementThreshold: extractCorrectRestDisplacementThreshold(dx),
+      }).start((finish) => {
+        // finish.finished &&
+        // typeof this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] ===
+        //   'function' &&
+        // this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id]()
+      });
+    });
+  }
 
-  // hideIconWhileMovingBehindCircle(key) {
-  //   this.setIconDisplayState(key, false);
+  hideIconWhileMovingBehindCircle(key) {
+    this.setIconDisplayState(key, false);
 
-  //   let timeout = setTimeout(() => {
-  //     this.setIconDisplayState(key, true);
-  //     clearTimeout(timeout);
-  //   }, this.ICON_HIDE_ON_THE_BACK_DURATION);
-  // }
+    let timeout = setTimeout(() => {
+      this.setIconDisplayState(key, true);
+      clearTimeout(timeout);
+    }, this.ICON_HIDE_ON_THE_BACK_DURATION);
+  }
 
-  // setIconDisplayState(key, state) {
-  //   this.setState({
-  //     ...this.state,
-  //     icons: [
-  //       ...this.state.icons.map((icon) => {
-  //         if (icon.id === key) {
-  //           icon.isShown = state;
-  //         }
+  setIconDisplayState(key, state) {
+    this.setState({
+      ...this.state,
+      icons: [
+        ...this.state.icons.map((icon) => {
+          if (icon.id === key) {
+            icon.isShown = state;
+          }
 
-  //         return icon;
-  //       }),
-  //     ],
-  //   });
-  // }
+          return icon;
+        }),
+      ],
+    });
+  }
 
-  // hideArrowHint() {
-  //   this.state.showArrowHint &&
-  //     this.setState({
-  //       ...this.state,
-  //       showArrowHint: false,
-  //     });
-  // }
+  hideArrowHint() {
+    this.state.showArrowHint &&
+      this.setState({
+        ...this.state,
+        showArrowHint: false,
+      });
+  }
 
   render() {
     let {onPress, style, styleIconText} = this.props;
 
     return (
       <View
-        onLayout={debounce(
-          this.defineAxesCoordinatesOnLayoutChangeByStylesOrScreenRotation,
-          100,
-        )}>
-        <View
-          style={{
-            width: 200,
-            height: 200,
-          }}
-          ref={(component) => (this._wheelNavigator = component)}
-          onLayout={this.defineAxesCoordinatesOnLayoutDisplacement}>
-          <Animated.View
-            style={this.rotateOnInputPixelDistanceMatchingRadianShift()}
-            {...this._panResponder.panHandlers}>
-            <CircleBlueGradient />
-          </Animated.View>
-        </View>
-      </View>
-    );
-
-    return (
-      <View
-        style={style}
+        // style={style}
+        style={{
+          width: 200,
+          height: 200,
+        }}
         onLayout={debounce(
           this.defineAxesCoordinatesOnLayoutChangeByStylesOrScreenRotation,
           100,
@@ -788,14 +760,34 @@ export default class ReactNativeRingPicker extends React.Component {
           styleIconText={styleIconText}
         />
         <View
-          style={[STYLES.wheel]}
+          // style={[STYLES.wheel]}
+          style={{
+            width: 200,
+            height: 200,
+          }}
           ref={(component) => (this._wheelNavigator = component)}
           onLayout={this.defineAxesCoordinatesOnLayoutDisplacement}>
-          {/* {this.state.showArrowHint && <View style={STYLES.swipeArrowHint}><SwipeArrowHint /></View>} */}
+          {/* {this.state.showArrowHint && (
+            <View style={[STYLES.swipeArrowHint]}>
+              <SwipeArrowHint />
+            </View>
+          )} */}
           <Animated.View
             style={this.rotateOnInputPixelDistanceMatchingRadianShift()}
             {...this._panResponder.panHandlers}>
-            <CircleBlueGradient />
+            {/* <CircleBlueGradient /> */}
+            <View
+              style={{
+                width: 200,
+                height: 200,
+                borderRadius: 200 / 2,
+                borderLeftColor: 'green',
+                borderTopColor: 'red',
+                borderRightColor: 'orange',
+                borderBottomColor: 'yellow',
+                borderWidth: 200 / 10,
+              }}
+            />
           </Animated.View>
           <View style={STYLES.wheelTouchableCenter}>
             <CircleTouchable onPress={this.goToCurrentFocusedPage} />

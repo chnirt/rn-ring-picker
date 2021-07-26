@@ -27,28 +27,39 @@ export function RingPickerV2({
         pan.setValue(0);
       },
       onPanResponderMove: (evt, gestureState) => {
-        // console.log('onPanResponderMove');
-        const {dx} = gestureState;
+        console.log(
+          'onPanResponderMove',
+          JSON.stringify(gestureState, null, 2),
+        );
+        const {dx, dy} = gestureState;
         pan.setValue(dx);
       },
       onPanResponderRelease: (evt, gestureState) => {
         // console.log('onPanResponderRelease');
         const {dx} = gestureState;
         pan.flattenOffset();
-        const ithCircleValue = getIthCircleValue(dx, pan);
-        const element = data[findIndexByIth(ithCircleValue)];
-        onMomentumScrollEnd(element);
-        Animated.spring(pan, {
-          toValue: ithCircleValue,
-          friction: 5,
-          tension: 10,
-          useNativeDriver: false,
-        }).start(() => {
-          simplifyOffset(pan);
-        });
+        // const ithCircleValue = getIthCircleValue(dx, pan);
+        // const element = data[findIndexByIth(ithCircleValue)];
+        // onMomentumScrollEnd(element);
+        // Animated.spring(pan, {
+        //   toValue: ithCircleValue,
+        //   friction: 5,
+        //   tension: 10,
+        //   useNativeDriver: false,
+        // }).start(() => {
+        //   // console.log('ithCircleValue', ithCircleValue);
+        //   simplifyOffset(pan);
+        // });
       },
     }),
   ).current;
+  const viewRef = useRef();
+  const XY_AXES_COORDINATESRef = useRef({
+    X: 0,
+    Y: 0,
+    PAGE_Y: 0,
+    PAGE_X: 0,
+  });
   const [prevStep, setPrevStep] = useState(0);
 
   function findIndexByIth(ith) {
@@ -70,12 +81,31 @@ export function RingPickerV2({
     );
     return (selectedCircle * 600) / data.length;
   }
+
+  function getIthCircleValueByIndex(index) {
+    const selectedCircle = Math.round(index / (600 / data.length));
+    return (selectedCircle * 600) / data.length;
+  }
+
+  function defineAxesCoordinatesOnLayoutDisplacement() {
+    viewRef.current.measure((x, y, width, height, pageX, pageY) => {
+      XY_AXES_COORDINATESRef.current = {
+        X: pageX + width / 2,
+        Y: pageY + height / 2,
+        PAGE_Y: pageY,
+        PAGE_X: pageX,
+      };
+    });
+  }
+
   if (data.length === 0) {
     return null;
   }
 
   return (
     <Animated.View
+      ref={viewRef}
+      onLayout={defineAxesCoordinatesOnLayoutDisplacement}
       style={{
         width: size,
         height: size,
@@ -118,68 +148,6 @@ export function RingPickerV2({
               }}
               onPress={() => {
                 const ithCircleValue = -index * deltaTheta * pxPerDeg;
-                // const ithCircleValue = getIthCircleValue(0, pan);
-                // const isFirst = index === 0;
-                // const isLast = index === data.length - 1;
-                // setPrevStep(index);
-                // // if (index > data.length / 2) {
-                // //   console.log('>');
-                // // } else {
-                // //   console.log('<');
-                // // }
-                // console.log(index, ithCircleValue, deltaTheta * pxPerDeg);
-                // if (isFirst) {
-                //   pan.setValue(0);
-                //   if (prevStep === 1) {
-                //     return;
-
-                //     // console.log(
-                //     //   'prevStep === 1👾',
-                //     //   index,
-                //     //   ithCircleValue,
-                //     //   deltaTheta * pxPerDeg,
-                //     // );
-                //     // Animated.timing(pan, {
-                //     //   toValue: 0,
-                //     //   useNativeDriver: false,
-                //     // }).start(() => {
-                //     //   // pan.setValue(0);
-                //     // });
-                //     // return;
-                //   }
-                //   // pan.setValue(0);
-                //   return;
-                //   //   // console.log(
-                //   //   //   'prevStep !== 1👾',
-                //   //   //   index,
-                //   //   //   ithCircleValue,
-                //   //   //   deltaTheta * pxPerDeg,
-                //   //   // );
-                //   //   Animated.timing(pan, {
-                //   //     toValue: -600,
-                //   //     useNativeDriver: false,
-                //   //   }).start(() => {
-                //   //     pan.setValue(0);
-                //   //   });
-                //   //   return;
-                // }
-                // if (isLast && prevStep === 0) {
-                //   pan.setValue(-550);
-                //   // return;
-                //   //   // console.log(
-                //   //   //   'index === data.length - 1 && prevStep === 0👾',
-                //   //   //   index,
-                //   //   //   ithCircleValue,
-                //   //   //   deltaTheta * pxPerDeg,
-                //   //   // );
-                //   //   Animated.timing(pan, {
-                //   //     toValue: deltaTheta * pxPerDeg,
-                //   //     useNativeDriver: false,
-                //   //   }).start(() => {
-                //   //     pan.setValue(ithCircleValue);
-                //   //   });
-                //   //   return;
-                // }
                 Animated.timing(pan, {
                   toValue: ithCircleValue,
                   useNativeDriver: false,
