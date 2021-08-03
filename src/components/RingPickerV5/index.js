@@ -1,22 +1,24 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View, Animated, PanResponder, Pressable, Text} from 'react-native';
 import {debounce} from 'lodash';
 
-export function RingPickerV4({
+export function RingPickerV5({
   visible,
   data = [],
   size = 200,
   elementSize = 50,
+  maxToRenderPerBatch,
   onPress = () => {},
 }) {
-  this.GIRTH_ANGLE = 120;
-  const length = data.length;
-  const deltaTheta = 360 / length;
+  this.AMOUNT_OF_DATA = data.length;
+  const deltaTheta = 360 / (maxToRenderPerBatch ?? this.AMOUNT_OF_DATA);
+  this.GIRTH_ANGLE = deltaTheta ?? 120;
 
   // 2*π*r / 360
   const STEP_LENGTH_TO_1_ANGLERef = useRef(1);
 
-  const pxPerDeg = (this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current) / 120;
+  const pxPerDeg =
+    (this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current) / this.GIRTH_ANGLE;
 
   this.DIRECTIONS = {
     CLOCKWISE: 'CLOCKWISE',
@@ -46,6 +48,7 @@ export function RingPickerV4({
   });
   const ICON_PATH_RADIUSRef = useRef(0);
   const wheelNavigatorRef = useRef();
+  const [centeredIndex, setCenteredIndex] = useState(this.AMOUNT_OF_DATA / 2);
   const pan = useRef(new Animated.Value(0)).current;
   const panResponder = useRef(
     PanResponder.create({
@@ -67,6 +70,14 @@ export function RingPickerV4({
         // console.log('onPanResponderRelease');
         pan.flattenOffset();
         const ithCircleValue = getIthCircleValue(pan);
+        const index = findIndexByIth(ithCircleValue);
+        const oppositeIndex = index + centeredIndex;
+        const {index: itemIndex, item} = getItemInLoopingArray(
+          data,
+          oppositeIndex,
+        );
+        console.log('hello', index, itemIndex);
+        setCenteredIndex(itemIndex);
         Animated.spring(pan, {
           toValue: ithCircleValue,
           friction: 5,
@@ -78,6 +89,8 @@ export function RingPickerV4({
       },
     }),
   ).current;
+
+  console.log(centeredIndex);
 
   useEffect(() => {
     return () => {
@@ -235,6 +248,18 @@ export function RingPickerV4({
     return selectedCircle * deltaTheta;
   }
 
+  function findIndexByIth(ith) {
+    if (ith >= 360 || ith <= -360) {
+      ith = ith % 360;
+    }
+    const start = ith / STEP_LENGTH_TO_1_ANGLERef.current / deltaTheta;
+    const index = data.findIndex(
+      (_, index) =>
+        index === (start <= 0 ? -start : this.AMOUNT_OF_DATA - start),
+    );
+    return index;
+  }
+
   function simplifyOffset(anim) {
     if (anim._value + anim._offset >= STEP_LENGTH_TO_1_ANGLERef.current)
       anim.setOffset(anim._offset - STEP_LENGTH_TO_1_ANGLERef.current);
@@ -277,7 +302,13 @@ export function RingPickerV4({
     defineAxesCoordinatesOnLayoutDisplacement();
   }
 
-  if (data.length === 0) {
+  function getItemInLoopingArray(arr, position) {
+    const index = position % arr.length;
+    const item = arr[index];
+    return {index, item};
+  }
+
+  if (this.AMOUNT_OF_DATA === 0) {
     return null;
   }
 
@@ -291,9 +322,71 @@ export function RingPickerV4({
         style={{
           width: size,
           height: size,
+          borderColor: 'red',
+          borderWidth: 1,
         }}
         ref={wheelNavigatorRef}
         onLayout={defineAxesCoordinatesOnLayoutDisplacement}>
+        {data.map((element, index) => {
+          function rotateOnInputPixelDistanceMatchingElement(index) {
+            return [
+              {
+                transform: [
+                  {
+                    rotate: pan.interpolate({
+                      inputRange: [
+                        -(this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current),
+                        0,
+                        this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current,
+                      ],
+                      outputRange: [
+                        `${deltaTheta * (index - 1)}deg`,
+                        `${deltaTheta * index}deg`,
+                        `${deltaTheta * (index + 1)}deg`,
+                      ],
+                    }),
+                  },
+                ],
+              },
+            ];
+          }
+
+          return (
+            <Animated.View
+              key={index}
+              style={[
+                {
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  top: size / 2,
+                  zIndex: 1,
+                  elevation: 1,
+                },
+                ...rotateOnInputPixelDistanceMatchingElement(
+                  index >= centeredIndex ? index - 1 : index,
+                ),
+              ]}>
+              <Pressable
+                style={{
+                  position: 'absolute',
+                  top: -size / 2,
+                  borderColor: 'orange',
+                  borderWidth: 1,
+                  height: elementSize,
+                  width: elementSize,
+                  borderRadius: elementSize / 2,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => {
+                  onPress(element);
+                }}>
+                <Text>{element?.label}</Text>
+              </Pressable>
+            </Animated.View>
+          );
+        })}
+
         <Animated.View
           style={rotateOnInputPixelDistanceMatchingRadianShift()}
           {...panResponder.panHandlers}>
@@ -304,19 +397,21 @@ export function RingPickerV4({
               width: size,
               height: size,
             }}>
-            {data.map((element, index) => {
+            {/* {data.map((element, index) => {
               return (
-                <View
+                <Animated.View
                   key={index}
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    transform: [
-                      {
-                        rotate: `${deltaTheta * index}deg`,
-                      },
-                    ],
-                  }}>
+                  style={[
+                    {
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      transform: [
+                        {
+                          rotate: `${deltaTheta * index}deg`,
+                        },
+                      ],
+                    },
+                  ]}>
                   <Pressable
                     style={{
                       position: 'absolute',
@@ -334,9 +429,21 @@ export function RingPickerV4({
                     }}>
                     <Text>{element?.label}</Text>
                   </Pressable>
-                </View>
+                </Animated.View>
               );
-            })}
+            })} */}
+            {/* <View
+              style={{
+                width: size,
+                height: size,
+                borderRadius: size / 2,
+                borderLeftColor: 'green',
+                borderTopColor: 'red',
+                borderRightColor: 'orange',
+                borderBottomColor: 'yellow',
+                borderWidth: size / 10,
+              }}
+            /> */}
           </View>
         </Animated.View>
       </View>

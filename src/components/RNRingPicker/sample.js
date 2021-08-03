@@ -30,7 +30,19 @@ export default class ReactNativeRingPicker extends React.Component {
     onPress: (iconId) => {},
     girthAngle: 120,
     iconHideOnTheBackDuration: 250,
-    icons: ['1', '2', '3', '4', '5'],
+    icons: [
+      {id: 'action_1', title: 'action_1'},
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+      '11',
+    ],
     showArrowHint: true,
     style: {},
     styleIconText: {},
@@ -65,7 +77,7 @@ export default class ReactNativeRingPicker extends React.Component {
     this.ICON_POSITION_ANGLE = this.GIRTH_ANGLE / this.AMOUNT_OF_ICONS;
 
     // 2*π*r / 360
-    this.STEP_LENGTH_TO_1_ANGLE = 1;
+    this.STEP_LENGTH_TO_1_ANGLE = 0;
 
     this.DIRECTIONS = {
       CLOCKWISE: 'CLOCKWISE',
@@ -105,8 +117,8 @@ export default class ReactNativeRingPicker extends React.Component {
       onMoveShouldSetResponderCapture: () => true, //Tell iOS that we are allowing the movement
       onMoveShouldSetPanResponderCapture: () => true, // Same here, tell iOS that we allow dragging
       onPanResponderGrant: (e, gestureState) => {
-        // this.hideArrowHint();
-        // this.resetCurrentValues();
+        this.hideArrowHint();
+        this.resetCurrentValues();
         this.setPreviousDifferenceLengths(0, 0);
         this.state.pan.setValue(this.state.pan._value);
       },
@@ -122,20 +134,17 @@ export default class ReactNativeRingPicker extends React.Component {
               this.CURRENT_VECTOR_DIFFERENCE_LENGTH /
               this.STEP_LENGTH_TO_1_ANGLE,
           },
-          () => {
-            this.calculateIconCurrentPositions(gestureState.vx);
-          },
+          () => this.calculateIconCurrentPositions(gestureState.vx),
         );
       },
       onPanResponderRelease: (evt, gestureState) => {
         let lastGesture = {...gestureState};
 
-        // this.createFinishAnimationPromisesAndResolveIfIconsAreNotMovingAlready();
-        this.snapNearestIconToVerticalAxis(lastGesture);
+        this.createFinishAnimationPromisesAndResolveIfIconsAreNotMovingAlready();
 
-        // Promise.all(this.getFinishAnimationPromises()).then(() =>
-        //   this.snapNearestIconToVerticalAxis(lastGesture),
-        // );
+        Promise.all(this.getFinishAnimationPromises()).then(() => {
+          this.snapNearestIconToVerticalAxis(lastGesture);
+        });
       },
     });
   }
@@ -168,22 +177,22 @@ export default class ReactNativeRingPicker extends React.Component {
       sign,
       currentSnappedIcon,
     } = this.getMinDistanceToVerticalAxisAndSnappedIcon();
-    // [minDistanceToVerticalAxis, minDistanceToHorizontalAxis] =
-    //   this.updateMinimalDistanceExponentialDeflection(
-    //     minDistanceToVerticalAxis,
-    //     minDistanceToHorizontalAxis,
-    //     currentSnappedIcon,
-    //   );
+    [minDistanceToVerticalAxis, minDistanceToHorizontalAxis] =
+      this.updateMinimalDistanceExponentialDeflection(
+        minDistanceToVerticalAxis,
+        minDistanceToHorizontalAxis,
+        currentSnappedIcon,
+      );
 
     this.updateCurrentDirectionBasedOnNearestIconPosition(sign);
     this.setAdditiveMovementLength(
       sign * minDistanceToVerticalAxis,
       -minDistanceToHorizontalAxis,
     );
-    // this.setPreviousDifferenceLengths(
-    //   lastGesture.dx + sign * minDistanceToVerticalAxis,
-    //   lastGesture.dy + minDistanceToHorizontalAxis,
-    // );
+    this.setPreviousDifferenceLengths(
+      lastGesture.dx + sign * minDistanceToVerticalAxis,
+      lastGesture.dy + minDistanceToHorizontalAxis,
+    );
     this.animateAllIconsToMatchVerticalAxis(currentSnappedIcon);
   }
 
@@ -316,11 +325,9 @@ export default class ReactNativeRingPicker extends React.Component {
         ...this.state,
         CURRENT_ICON_SHIFT:
           this.CURRENT_VECTOR_DIFFERENCE_LENGTH / this.STEP_LENGTH_TO_1_ANGLE,
-        // currentSnappedIcon: currentSnappedIcon,
+        currentSnappedIcon: currentSnappedIcon,
       },
-      () => {
-        // this.calculateIconCurrentPositions();
-      },
+      () => this.calculateIconCurrentPositions(),
     );
   }
 
@@ -686,7 +693,7 @@ export default class ReactNativeRingPicker extends React.Component {
       return 10;
     }
 
-    this.state.icons.forEach((icon) => {
+    this.state.icons.forEach((icon, index) => {
       let coordinates = this.calculateIconCurrentPosition(icon);
 
       Animated.spring(icon.position, {
@@ -699,12 +706,13 @@ export default class ReactNativeRingPicker extends React.Component {
         restSpeedThreshold: 10,
         bounciness: 0,
         restDisplacementThreshold: extractCorrectRestDisplacementThreshold(dx),
-      }).start((finish) => {
-        // finish.finished &&
-        // typeof this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] ===
-        //   'function' &&
-        // this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id]()
-      });
+      }).start(
+        (finish) =>
+          finish.finished &&
+          typeof this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] ===
+            'function' &&
+          this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id](),
+      );
     });
   }
 
@@ -745,11 +753,7 @@ export default class ReactNativeRingPicker extends React.Component {
 
     return (
       <View
-        // style={style}
-        style={{
-          width: 200,
-          height: 200,
-        }}
+        style={style}
         onLayout={debounce(
           this.defineAxesCoordinatesOnLayoutChangeByStylesOrScreenRotation,
           100,
@@ -760,34 +764,18 @@ export default class ReactNativeRingPicker extends React.Component {
           styleIconText={styleIconText}
         />
         <View
-          // style={[STYLES.wheel]}
-          style={{
-            width: 200,
-            height: 200,
-          }}
+          style={[STYLES.wheel]}
           ref={(component) => (this._wheelNavigator = component)}
           onLayout={this.defineAxesCoordinatesOnLayoutDisplacement}>
-          {/* {this.state.showArrowHint && (
-            <View style={[STYLES.swipeArrowHint]}>
+          {this.state.showArrowHint && (
+            <View style={STYLES.swipeArrowHint}>
               <SwipeArrowHint />
             </View>
-          )} */}
+          )}
           <Animated.View
             style={this.rotateOnInputPixelDistanceMatchingRadianShift()}
             {...this._panResponder.panHandlers}>
-            {/* <CircleBlueGradient /> */}
-            <View
-              style={{
-                width: 200,
-                height: 200,
-                borderRadius: 200 / 2,
-                borderLeftColor: 'green',
-                borderTopColor: 'red',
-                borderRightColor: 'orange',
-                borderBottomColor: 'yellow',
-                borderWidth: 200 / 10,
-              }}
-            />
+            <CircleBlueGradient />
           </Animated.View>
           <View style={STYLES.wheelTouchableCenter}>
             <CircleTouchable onPress={this.goToCurrentFocusedPage} />

@@ -1,9 +1,9 @@
 import React from 'react';
 import {View} from 'react-native';
-import {RingPickerV2, RingPickerV4} from './src/components';
+import {RingPicker, RingPickerV4, RingPickerV5} from './src/components';
 import RNRingPicker from './src/components/RNRingPicker/sample';
 
-const data = [...Array(10).keys()].map((element, index) => ({
+const data = [...Array(6).keys()].map((element, index) => ({
   id: index,
   label: element,
 }));
@@ -24,11 +24,13 @@ function App() {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <RingPickerV4
+      {/* <RNRingPicker /> */}
+      <RingPickerV5
         data={data}
         onPress={handleOnPress}
         onMomentumScrollEnd={handleOnMomentumScrollEnd}
         size={400}
+        maxToRenderPerBatch={5}
       />
     </View>
   );
