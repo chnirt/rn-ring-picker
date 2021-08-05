@@ -418,6 +418,16 @@ export function RingPickerV5({
                   alignItems: 'center',
                 }}
                 onPress={() => {
+                  const ithCircleValue =
+                    -index *
+                    this.GIRTH_ANGLE *
+                    STEP_LENGTH_TO_1_ANGLERef.current;
+                  Animated.timing(pan, {
+                    toValue: ithCircleValue,
+                    useNativeDriver: false,
+                  }).start(() => {
+                    simplifyOffset(pan);
+                  });
                   onPress(element);
                 }}>
                 {typeof renderItem === 'function' ? (
