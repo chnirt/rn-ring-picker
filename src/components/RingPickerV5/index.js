@@ -10,6 +10,7 @@ export function RingPickerV5({
   maxToRenderPerBatch,
   renderItem,
   onPress = () => {},
+  onMomentumScrollEnd = () => {},
 }) {
   this.AMOUNT_OF_DATA = data.length;
   this.GIRTH_ANGLE = 360 / (maxToRenderPerBatch ?? this.AMOUNT_OF_DATA);
@@ -47,23 +48,21 @@ export function RingPickerV5({
   const wheelNavigatorRef = useRef();
   const pan = useRef(new Animated.Value(0)).current;
 
-  const [centeredIndex, setCenteredIndex] = useState(this.AMOUNT_OF_DATA / 2);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const formatData = [
-    currentIndex - 2,
-    currentIndex - 1,
-    currentIndex,
-    currentIndex + 1,
-    currentIndex + 2,
-  ].map((s) => {
+  const formatData = range(
+    currentIndex - (maxToRenderPerBatch - 1) / 2,
+    currentIndex + (maxToRenderPerBatch - 1) / 2,
+  ).map((s) => {
     // console.log('data', data);
     const {item} = getItemInLoopingArray(data, s);
     // console.log(index);
     return item;
   });
   // console.log('formatData', formatData);
-  const a = formatData.slice(0, 2);
-  const b = formatData.slice(-3);
+  const a = formatData.slice(0, (maxToRenderPerBatch - 1) / 2);
+  const b = formatData.slice(
+    (maxToRenderPerBatch - 1) / 2 - maxToRenderPerBatch,
+  );
   const c = [...b, ...a];
   let newArray = c;
   // console.log('currentIndex', currentIndex);
@@ -78,9 +77,9 @@ export function RingPickerV5({
     }
   }
   if (currentIndex < 0) {
-    const {index: itemIndex} = getItemInLoopingArray(data, currentIndex);
-    console.log(itemIndex);
-    console.log(currentIndex);
+    // const {index: itemIndex} = getItemInLoopingArray(data, currentIndex);
+    // console.log(itemIndex);
+    // console.log(currentIndex);
     const g = newArray.slice(Math.abs(currentIndex), this.AMOUNT_OF_DATA - 1);
     const h = newArray.slice(0, Math.abs(currentIndex));
     const i = [...g, ...h];
@@ -107,12 +106,14 @@ export function RingPickerV5({
         defineCurrentSection(gestureState.moveX, gestureState.moveY);
         checkPreviousDifferenceLengths(gestureState.dx, gestureState.dy);
         pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
-        defineCenteredIndex(pan);
+        const {index} = defineIndexItem(pan);
+        setCurrentIndex(index);
       },
       onPanResponderRelease: (evt, gestureState) => {
         // console.log('onPanResponderRelease');
         pan.flattenOffset();
-        // defineCenteredIndex(pan);
+        const {item} = defineIndexItem(pan);
+        onMomentumScrollEnd(item);
         const ithCircleValue = getIthCircleValue(pan);
         Animated.spring(pan, {
           toValue: ithCircleValue,
@@ -133,6 +134,13 @@ export function RingPickerV5({
       resetCurrentValues();
     };
   }, [visible]);
+
+  function range(start, end, step = 1) {
+    const len = Math.floor((end - start) / step) + 1;
+    return Array(len)
+      .fill()
+      .map((_, idx) => start + idx * step);
+  }
 
   function defineCurrentSection(x, y) {
     let yAxis = y < XY_AXES_COORDINATESRef.current.Y ? 'TOP' : 'BOTTOM';
@@ -282,22 +290,21 @@ export function RingPickerV5({
     return selectedCircle * this.GIRTH_ANGLE;
   }
 
+  function getIthCircleValueWithIndex(index) {
+    const selectedCircle = index;
+    return selectedCircle * this.GIRTH_ANGLE;
+  }
+
   function findIndexByIth(ith) {
     const stepIndex =
       -ith / STEP_LENGTH_TO_1_ANGLERef.current / this.GIRTH_ANGLE;
     return stepIndex;
   }
 
-  function defineCenteredIndex(deltaAnim) {
+  function defineIndexItem(deltaAnim) {
     const ithCircleValue = getIthCircleValue(deltaAnim);
     const index = findIndexByIth(ithCircleValue);
-    const {index: getCurrentIndex} = getItemInLoopingArray(data, index);
-    // console.log('getCurrentIndex', getCurrentIndex);
-    setCurrentIndex(index);
-
-    const oppositeIndex = index + centeredIndex;
-    const {index: itemIndex} = getItemInLoopingArray(data, oppositeIndex);
-    setCenteredIndex(itemIndex);
+    return getItemInLoopingArray(data, index);
   }
 
   function simplifyOffset(anim) {
@@ -418,16 +425,13 @@ export function RingPickerV5({
                   alignItems: 'center',
                 }}
                 onPress={() => {
-                  const ithCircleValue =
-                    -index *
-                    this.GIRTH_ANGLE *
-                    STEP_LENGTH_TO_1_ANGLERef.current;
-                  Animated.timing(pan, {
+                  const ithCircleValue = getIthCircleValueWithIndex(-index);
+                  Animated.spring(pan, {
                     toValue: ithCircleValue,
+                    friction: 5,
+                    tension: 10,
                     useNativeDriver: false,
-                  }).start(() => {
-                    simplifyOffset(pan);
-                  });
+                  }).start();
                   onPress(element);
                 }}>
                 {typeof renderItem === 'function' ? (
