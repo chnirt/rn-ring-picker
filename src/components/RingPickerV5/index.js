@@ -8,17 +8,14 @@ export function RingPickerV5({
   size = 200,
   elementSize = 50,
   maxToRenderPerBatch,
+  renderItem,
   onPress = () => {},
 }) {
   this.AMOUNT_OF_DATA = data.length;
-  const deltaTheta = 360 / (maxToRenderPerBatch ?? this.AMOUNT_OF_DATA);
-  this.GIRTH_ANGLE = deltaTheta ?? 120;
+  this.GIRTH_ANGLE = 360 / (maxToRenderPerBatch ?? this.AMOUNT_OF_DATA);
 
   // 2*π*r / 360
   const STEP_LENGTH_TO_1_ANGLERef = useRef(1);
-
-  const pxPerDeg =
-    (this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current) / this.GIRTH_ANGLE;
 
   this.DIRECTIONS = {
     CLOCKWISE: 'CLOCKWISE',
@@ -48,8 +45,53 @@ export function RingPickerV5({
   });
   const ICON_PATH_RADIUSRef = useRef(0);
   const wheelNavigatorRef = useRef();
-  const [centeredIndex, setCenteredIndex] = useState(this.AMOUNT_OF_DATA / 2);
   const pan = useRef(new Animated.Value(0)).current;
+
+  const [centeredIndex, setCenteredIndex] = useState(this.AMOUNT_OF_DATA / 2);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const formatData = [
+    currentIndex - 2,
+    currentIndex - 1,
+    currentIndex,
+    currentIndex + 1,
+    currentIndex + 2,
+  ].map((s) => {
+    // console.log('data', data);
+    const {item} = getItemInLoopingArray(data, s);
+    // console.log(index);
+    return item;
+  });
+  // console.log('formatData', formatData);
+  const a = formatData.slice(0, 2);
+  const b = formatData.slice(-3);
+  const c = [...b, ...a];
+  let newArray = c;
+  // console.log('currentIndex', currentIndex);
+  if (currentIndex >= 1) {
+    const d = newArray.slice(0, this.AMOUNT_OF_DATA - 1 - currentIndex);
+    const e = newArray.slice(-currentIndex);
+    const f = [...e, ...d];
+    newArray = f;
+    if (currentIndex > this.AMOUNT_OF_DATA - 1) {
+      CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current = 0;
+      pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
+    }
+  }
+  if (currentIndex < 0) {
+    const {index: itemIndex} = getItemInLoopingArray(data, currentIndex);
+    console.log(itemIndex);
+    console.log(currentIndex);
+    const g = newArray.slice(Math.abs(currentIndex), this.AMOUNT_OF_DATA - 1);
+    const h = newArray.slice(0, Math.abs(currentIndex));
+    const i = [...g, ...h];
+    newArray = i;
+    if (currentIndex < -(this.AMOUNT_OF_DATA - 1)) {
+      CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current = 0;
+      pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
+    }
+  }
+  const e = newArray;
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetResponderCapture: () => true,
@@ -65,19 +107,13 @@ export function RingPickerV5({
         defineCurrentSection(gestureState.moveX, gestureState.moveY);
         checkPreviousDifferenceLengths(gestureState.dx, gestureState.dy);
         pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
+        defineCenteredIndex(pan);
       },
       onPanResponderRelease: (evt, gestureState) => {
         // console.log('onPanResponderRelease');
         pan.flattenOffset();
+        // defineCenteredIndex(pan);
         const ithCircleValue = getIthCircleValue(pan);
-        const index = findIndexByIth(ithCircleValue);
-        const oppositeIndex = index + centeredIndex;
-        const {index: itemIndex, item} = getItemInLoopingArray(
-          data,
-          oppositeIndex,
-        );
-        console.log('hello', index, itemIndex);
-        setCenteredIndex(itemIndex);
         Animated.spring(pan, {
           toValue: ithCircleValue,
           friction: 5,
@@ -89,8 +125,6 @@ export function RingPickerV5({
       },
     }),
   ).current;
-
-  console.log(centeredIndex);
 
   useEffect(() => {
     return () => {
@@ -243,21 +277,27 @@ export function RingPickerV5({
 
   function getIthCircleValue(deltaAnim) {
     const selectedCircle = Math.round(
-      (deltaAnim._value + deltaAnim._offset) / deltaTheta,
+      (deltaAnim._value + deltaAnim._offset) / this.GIRTH_ANGLE,
     );
-    return selectedCircle * deltaTheta;
+    return selectedCircle * this.GIRTH_ANGLE;
   }
 
   function findIndexByIth(ith) {
-    if (ith >= 360 || ith <= -360) {
-      ith = ith % 360;
-    }
-    const start = ith / STEP_LENGTH_TO_1_ANGLERef.current / deltaTheta;
-    const index = data.findIndex(
-      (_, index) =>
-        index === (start <= 0 ? -start : this.AMOUNT_OF_DATA - start),
-    );
-    return index;
+    const stepIndex =
+      -ith / STEP_LENGTH_TO_1_ANGLERef.current / this.GIRTH_ANGLE;
+    return stepIndex;
+  }
+
+  function defineCenteredIndex(deltaAnim) {
+    const ithCircleValue = getIthCircleValue(deltaAnim);
+    const index = findIndexByIth(ithCircleValue);
+    const {index: getCurrentIndex} = getItemInLoopingArray(data, index);
+    // console.log('getCurrentIndex', getCurrentIndex);
+    setCurrentIndex(index);
+
+    const oppositeIndex = index + centeredIndex;
+    const {index: itemIndex} = getItemInLoopingArray(data, oppositeIndex);
+    setCenteredIndex(itemIndex);
   }
 
   function simplifyOffset(anim) {
@@ -303,8 +343,12 @@ export function RingPickerV5({
   }
 
   function getItemInLoopingArray(arr, position) {
-    const index = position % arr.length;
-    const item = arr[index];
+    let item;
+    let index = position % arr.length;
+    item = arr[index];
+    if (index < 0) {
+      item = arr[arr.length + index];
+    }
     return {index, item};
   }
 
@@ -321,13 +365,15 @@ export function RingPickerV5({
       <View
         style={{
           width: size,
-          height: size,
-          borderColor: 'red',
-          borderWidth: 1,
+          aspectRatio: 1,
+          // height: size * 0.85,
+          // borderColor: 'red',
+          // borderWidth: 1,
+          // overflow: 'hidden',
         }}
         ref={wheelNavigatorRef}
         onLayout={defineAxesCoordinatesOnLayoutDisplacement}>
-        {data.map((element, index) => {
+        {e?.map((element, index) => {
           function rotateOnInputPixelDistanceMatchingElement(index) {
             return [
               {
@@ -340,9 +386,9 @@ export function RingPickerV5({
                         this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current,
                       ],
                       outputRange: [
-                        `${deltaTheta * (index - 1)}deg`,
-                        `${deltaTheta * index}deg`,
-                        `${deltaTheta * (index + 1)}deg`,
+                        `${this.GIRTH_ANGLE * (index - 1)}deg`,
+                        `${this.GIRTH_ANGLE * index}deg`,
+                        `${this.GIRTH_ANGLE * (index + 1)}deg`,
                       ],
                     }),
                   },
@@ -362,26 +408,34 @@ export function RingPickerV5({
                   zIndex: 1,
                   elevation: 1,
                 },
-                ...rotateOnInputPixelDistanceMatchingElement(
-                  index >= centeredIndex ? index - 1 : index,
-                ),
+                ...rotateOnInputPixelDistanceMatchingElement(index),
               ]}>
               <Pressable
                 style={{
                   position: 'absolute',
                   top: -size / 2,
-                  borderColor: 'orange',
-                  borderWidth: 1,
-                  height: elementSize,
-                  width: elementSize,
-                  borderRadius: elementSize / 2,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
                 onPress={() => {
                   onPress(element);
                 }}>
-                <Text>{element?.label}</Text>
+                {typeof renderItem === 'function' ? (
+                  renderItem({item: element, index})
+                ) : (
+                  <View
+                    style={{
+                      borderColor: 'orange',
+                      borderWidth: 1,
+                      height: elementSize,
+                      width: elementSize,
+                      borderRadius: elementSize / 2,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text>{element?.label}</Text>
+                  </View>
+                )}
               </Pressable>
             </Animated.View>
           );
@@ -407,7 +461,7 @@ export function RingPickerV5({
                       alignItems: 'center',
                       transform: [
                         {
-                          rotate: `${deltaTheta * index}deg`,
+                          rotate: `${this.GIRTH_ANGLE * index}deg`,
                         },
                       ],
                     },

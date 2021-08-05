@@ -29,7 +29,7 @@ function App() {
         data={data}
         onPress={handleOnPress}
         onMomentumScrollEnd={handleOnMomentumScrollEnd}
-        size={400}
+        size={300}
         maxToRenderPerBatch={5}
       />
     </View>
