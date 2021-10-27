@@ -1,16 +1,17 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Animated, Easing, PanResponder, View} from 'react-native';
-import {SQUARE_DIMENSIONS} from './util';
-import {STYLES} from './styles';
-import {Icons} from './components/Icons';
-import {CircleBlueGradient} from './components/CircleBlueGradient';
-import {CircleTouchable} from './components/CircleTouchable';
-import {SwipeArrowHint} from './icons/SwipeArrowHint';
-import {Circle} from './icons/Circle';
-import {debounce} from 'debounce';
+import React from "react";
+import PropTypes from "prop-types";
+import { Animated, Easing, PanResponder, View } from "react-native";
+import { SQUARE_DIMENSIONS } from "./util";
+import { STYLES } from "./styles";
+import { Icons } from "./components/Icons";
+import { CircleBlueGradient } from "./components/CircleBlueGradient";
+import { CircleTouchable } from "./components/CircleTouchable";
+import { SwipeArrowHint } from "./icons/SwipeArrowHint";
+import { Circle } from "./icons/Circle";
+import { debounce } from "debounce";
 
 export default class ReactNativeRingPicker extends React.Component {
+
   static DEFAULT_ICON = (color) => <Circle color={color} />;
 
   static propTypes = {
@@ -23,32 +24,26 @@ export default class ReactNativeRingPicker extends React.Component {
     styleIconText: PropTypes.object,
     defaultIconColor: PropTypes.string,
     isExpDistCorrection: PropTypes.bool,
-    noExpDistCorrectionDegree: PropTypes.number,
+    noExpDistCorrectionDegree: PropTypes.number
   };
 
   static defaultProps = {
-    onPress: (iconId) => {},
+    onPress: (iconId) => { },
     girthAngle: 120,
     iconHideOnTheBackDuration: 250,
     icons: [
-      {id: 'action_1', title: 'action_1'},
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
-      '11',
+      { id: "action_1", title: "action_1" },
+      "action_2",
+      "action_3",
+      "action_4",
+      "action_5"
     ],
     showArrowHint: true,
     style: {},
     styleIconText: {},
     defaultIconColor: undefined,
     isExpDistCorrection: true,
-    noExpDistCorrectionDegree: 15,
+    noExpDistCorrectionDegree: 15
   };
 
   constructor(props) {
@@ -66,9 +61,9 @@ export default class ReactNativeRingPicker extends React.Component {
         X: 0,
         Y: 0,
         PAGE_Y: 0,
-        PAGE_X: 0,
+        PAGE_X: 0
       },
-      CURRENT_ICON_SHIFT: 0,
+      CURRENT_ICON_SHIFT: 0
     };
 
     this.INDEX_EXTRACTORS = {};
@@ -80,15 +75,15 @@ export default class ReactNativeRingPicker extends React.Component {
     this.STEP_LENGTH_TO_1_ANGLE = 0;
 
     this.DIRECTIONS = {
-      CLOCKWISE: 'CLOCKWISE',
-      COUNTERCLOCKWISE: 'COUNTERCLOCKWISE',
+      CLOCKWISE: "CLOCKWISE",
+      COUNTERCLOCKWISE: "COUNTERCLOCKWISE"
     };
 
     this.CIRCLE_SECTIONS = {
-      TOP_LEFT: 'TOP_LEFT',
-      TOP_RIGHT: 'TOP_RIGHT',
-      BOTTOM_LEFT: 'BOTTOM_LEFT',
-      BOTTOM_RIGHT: 'BOTTOM_RIGHT',
+      TOP_LEFT: "TOP_LEFT",
+      TOP_RIGHT: "TOP_RIGHT",
+      BOTTOM_LEFT: "BOTTOM_LEFT",
+      BOTTOM_RIGHT: "BOTTOM_RIGHT"
     };
 
     this.CURRENT_CIRCLE_SECTION = null;
@@ -97,20 +92,14 @@ export default class ReactNativeRingPicker extends React.Component {
 
     this.PREVIOUS_POSITION = {
       X: 0,
-      Y: 0,
+      Y: 0
     };
 
     this.ICON_HIDE_ON_THE_BACK_DURATION = this.props.iconHideOnTheBackDuration;
 
     this.ALL_ICONS_FINISH_ANIMATIONS = {
-      promises: this.state.icons.reduce((promises, icon) => {
-        promises[icon.id] = null;
-        return promises;
-      }, {}),
-      resolvers: this.state.icons.reduce((resolvers, icon) => {
-        resolvers[icon.id] = null;
-        return resolvers;
-      }, {}),
+      promises: this.state.icons.reduce((promises, icon) => { promises[icon.id] = null; return promises }, {}),
+      resolvers: this.state.icons.reduce((resolvers, icon) => { resolvers[icon.id] = null; return resolvers }, {})
     };
 
     this._panResponder = PanResponder.create({
@@ -127,25 +116,20 @@ export default class ReactNativeRingPicker extends React.Component {
         this.checkPreviousDifferenceLengths(gestureState.dx, gestureState.dy);
 
         this.state.pan.setValue(this.CURRENT_VECTOR_DIFFERENCE_LENGTH);
-        this.setState(
-          {
-            ...this.state,
-            CURRENT_ICON_SHIFT:
-              this.CURRENT_VECTOR_DIFFERENCE_LENGTH /
-              this.STEP_LENGTH_TO_1_ANGLE,
-          },
-          () => this.calculateIconCurrentPositions(gestureState.vx),
-        );
+        this.setState({
+          ...this.state,
+          CURRENT_ICON_SHIFT: this.CURRENT_VECTOR_DIFFERENCE_LENGTH / this.STEP_LENGTH_TO_1_ANGLE
+        }, () => this.calculateIconCurrentPositions(gestureState.vx));
       },
       onPanResponderRelease: (evt, gestureState) => {
-        let lastGesture = {...gestureState};
+        let lastGesture = { ...gestureState };
 
         this.createFinishAnimationPromisesAndResolveIfIconsAreNotMovingAlready();
 
-        Promise.all(this.getFinishAnimationPromises()).then(() => {
-          this.snapNearestIconToVerticalAxis(lastGesture);
-        });
-      },
+        Promise
+          .all(this.getFinishAnimationPromises())
+          .then(() => this.snapNearestIconToVerticalAxis(lastGesture));
+      }
     });
   }
 
@@ -154,45 +138,23 @@ export default class ReactNativeRingPicker extends React.Component {
   }
 
   getFinishAnimationPromises() {
-    return this.state.icons.map(
-      (icon) => this.ALL_ICONS_FINISH_ANIMATIONS.promises[icon.id],
-    );
+    return this.state.icons.map((icon) => this.ALL_ICONS_FINISH_ANIMATIONS.promises[icon.id]);
   }
 
   createFinishAnimationPromisesAndResolveIfIconsAreNotMovingAlready() {
     this.state.icons.forEach((icon) => {
-      this.ALL_ICONS_FINISH_ANIMATIONS.promises[icon.id] = new Promise(
-        (resolve) =>
-          (this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] = resolve),
-      );
-      !icon.position.x._animation &&
-        this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id]();
+      this.ALL_ICONS_FINISH_ANIMATIONS.promises[icon.id] = new Promise((resolve) => this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] = resolve);
+      !icon.position.x._animation && this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id]();
     });
   }
 
   snapNearestIconToVerticalAxis(lastGesture) {
-    let {
-      minDistanceToVerticalAxis,
-      minDistanceToHorizontalAxis,
-      sign,
-      currentSnappedIcon,
-    } = this.getMinDistanceToVerticalAxisAndSnappedIcon();
-    [minDistanceToVerticalAxis, minDistanceToHorizontalAxis] =
-      this.updateMinimalDistanceExponentialDeflection(
-        minDistanceToVerticalAxis,
-        minDistanceToHorizontalAxis,
-        currentSnappedIcon,
-      );
+    let { minDistanceToVerticalAxis, minDistanceToHorizontalAxis, sign, currentSnappedIcon } = this.getMinDistanceToVerticalAxisAndSnappedIcon();
+    [minDistanceToVerticalAxis, minDistanceToHorizontalAxis] = this.updateMinimalDistanceExponentialDeflection(minDistanceToVerticalAxis, minDistanceToHorizontalAxis, currentSnappedIcon);
 
     this.updateCurrentDirectionBasedOnNearestIconPosition(sign);
-    this.setAdditiveMovementLength(
-      sign * minDistanceToVerticalAxis,
-      -minDistanceToHorizontalAxis,
-    );
-    this.setPreviousDifferenceLengths(
-      lastGesture.dx + sign * minDistanceToVerticalAxis,
-      lastGesture.dy + minDistanceToHorizontalAxis,
-    );
+    this.setAdditiveMovementLength((sign * minDistanceToVerticalAxis), -minDistanceToHorizontalAxis);
+    this.setPreviousDifferenceLengths(lastGesture.dx + (sign * minDistanceToVerticalAxis), lastGesture.dy + minDistanceToHorizontalAxis);
     this.animateAllIconsToMatchVerticalAxis(currentSnappedIcon);
   }
 
@@ -201,41 +163,27 @@ export default class ReactNativeRingPicker extends React.Component {
     let minDistanceToHorizontalAxis = this.STEP_LENGTH_TO_1_ANGLE * 360;
     let sign = 1;
     let currentSnappedIcon = null;
-    let yCoordinateFromCssStyling =
-      STYLES.iconContainer.top - SQUARE_DIMENSIONS.ICON_PADDING_FROM_WHEEL;
+    let yCoordinateFromCssStyling = STYLES.iconContainer.top - SQUARE_DIMENSIONS.ICON_PADDING_FROM_WHEEL;
 
     this.state.icons.forEach((icon) => {
-      let iconXCenterCoordinate =
-        icon.position.x.__getValue() + STYLES.icon.width / 2;
+      let iconXCenterCoordinate = icon.position.x.__getValue() + STYLES.icon.width / 2;
       let iconYCenterCoordinate = icon.position.y.__getValue();
 
-      let distanceToXAxis = Math.abs(
-        iconXCenterCoordinate -
-          (this.state.XY_AXES_COORDINATES.X -
-            this.state.XY_AXES_COORDINATES.PAGE_X),
-      );
-      let distanceToYAxis = Math.abs(
-        yCoordinateFromCssStyling - iconYCenterCoordinate,
-      );
+      let distanceToXAxis = Math.abs((iconXCenterCoordinate) - (this.state.XY_AXES_COORDINATES.X - this.state.XY_AXES_COORDINATES.PAGE_X));
+      let distanceToYAxis = Math.abs(yCoordinateFromCssStyling - iconYCenterCoordinate);
 
       if (distanceToYAxis <= minDistanceToHorizontalAxis) {
         minDistanceToHorizontalAxis = distanceToYAxis;
       }
 
       if (distanceToXAxis <= minDistanceToVerticalAxis) {
-        if (
-          iconXCenterCoordinate >
-          this.state.XY_AXES_COORDINATES.X -
-            this.state.XY_AXES_COORDINATES.PAGE_X
-        ) {
+        if (iconXCenterCoordinate > (this.state.XY_AXES_COORDINATES.X - this.state.XY_AXES_COORDINATES.PAGE_X)) {
           sign = -1;
-        } else if (
-          iconXCenterCoordinate <
-          this.state.XY_AXES_COORDINATES.X -
-            this.state.XY_AXES_COORDINATES.PAGE_X
-        ) {
+        }
+        else if (iconXCenterCoordinate < (this.state.XY_AXES_COORDINATES.X - this.state.XY_AXES_COORDINATES.PAGE_X)) {
           sign = 1;
-        } else {
+        }
+        else {
           sign = 0;
           minDistanceToVerticalAxis = 0;
         }
@@ -248,17 +196,18 @@ export default class ReactNativeRingPicker extends React.Component {
       minDistanceToVerticalAxis,
       minDistanceToHorizontalAxis,
       sign,
-      currentSnappedIcon,
+      currentSnappedIcon
     };
   }
 
   updateCurrentDirectionBasedOnNearestIconPosition(sign) {
     if (sign > 0) {
       this.CURRENT_DIRECTION = this.DIRECTIONS.CLOCKWISE;
-    } else {
+    }
+    else {
       this.CURRENT_DIRECTION = this.DIRECTIONS.COUNTERCLOCKWISE;
     }
-  }
+  };
 
   adjustMinimalExponentialDistanceCorrection(angle, minV, minH) {
     if (!this.props.isExpDistCorrection) {
@@ -269,13 +218,8 @@ export default class ReactNativeRingPicker extends React.Component {
     let lowestBoundaryDegree = 270 - this.props.noExpDistCorrectionDegree;
     let highestBoundaryDegree = 270 + this.props.noExpDistCorrectionDegree;
 
-    if (
-      currentAngle < lowestBoundaryDegree ||
-      currentAngle > highestBoundaryDegree
-    ) {
-      let number =
-        (15 - 0.004165 * Math.pow(currentAngle - 270, 2)) *
-        this.STEP_LENGTH_TO_1_ANGLE;
+    if (currentAngle < lowestBoundaryDegree || currentAngle > highestBoundaryDegree) {
+      let number = (15 - 0.004165 * Math.pow((currentAngle - 270), 2)) * this.STEP_LENGTH_TO_1_ANGLE;
 
       return [minV - number, minH - Math.sqrt(number) / 2];
     }
@@ -287,48 +231,35 @@ export default class ReactNativeRingPicker extends React.Component {
    * if current angle is lower than 270 center angle minus 15 degrees gap, that implies parabolic distance
    * from this. 30 degrees center gap - adjust minimal distance to vertical axis regarding this parabolic distance
    */
-  updateMinimalDistanceExponentialDeflection(
-    minDistanceToVerticalAxis,
-    minDistanceToHorizontalAxis,
-    currentSnappedIcon,
-  ) {
+  updateMinimalDistanceExponentialDeflection(minDistanceToVerticalAxis, minDistanceToHorizontalAxis, currentSnappedIcon) {
     const id = currentSnappedIcon.id;
     const index = currentSnappedIcon.index;
 
     let minV = minDistanceToVerticalAxis;
     let minH = minDistanceToHorizontalAxis;
 
-    let currentAngle =
-      270 +
-      this.state.CURRENT_ICON_SHIFT +
-      (this.INDEX_EXTRACTORS[id] || 0) +
-      index * this.ICON_POSITION_ANGLE;
+    let currentAngle = (270 + this.state.CURRENT_ICON_SHIFT + (this.INDEX_EXTRACTORS[id] || 0) + (index * this.ICON_POSITION_ANGLE));
 
-    [minV, minH] = this.adjustMinimalExponentialDistanceCorrection(
-      currentAngle,
+    [minV, minH] = this.adjustMinimalExponentialDistanceCorrection(currentAngle, minV, minH);
+
+    return [
       minV,
-      minH,
-    );
-
-    return [minV, minH];
+      minH
+    ]
   }
 
   animateAllIconsToMatchVerticalAxis(currentSnappedIcon) {
     Animated.spring(this.state.pan, {
       toValue: this.CURRENT_VECTOR_DIFFERENCE_LENGTH,
       easing: Easing.linear,
-      speed: 12,
+      speed: 12
       // useNativeDriver: true // if this is used - the last click after previous release will twist back nad forward
     }).start();
-    this.setState(
-      {
-        ...this.state,
-        CURRENT_ICON_SHIFT:
-          this.CURRENT_VECTOR_DIFFERENCE_LENGTH / this.STEP_LENGTH_TO_1_ANGLE,
-        currentSnappedIcon: currentSnappedIcon,
-      },
-      () => this.calculateIconCurrentPositions(),
-    );
+    this.setState({
+      ...this.state,
+      CURRENT_ICON_SHIFT: this.CURRENT_VECTOR_DIFFERENCE_LENGTH / this.STEP_LENGTH_TO_1_ANGLE,
+      currentSnappedIcon: currentSnappedIcon
+    }, () => this.calculateIconCurrentPositions());
   }
 
   /**
@@ -379,16 +310,14 @@ export default class ReactNativeRingPicker extends React.Component {
       if (React.isValidElement(propIcon)) {
         return propIcon.props?.id || propIcon.type.name.toLowerCase();
       }
-      return typeof propIcon === 'object' ? propIcon.id || 'default' : propIcon;
+      return typeof propIcon === "object" ? propIcon.id || "default" : propIcon;
     }
 
     function getTitle(propIcon) {
       if (React.isValidElement(propIcon)) {
         return propIcon.props?.title || propIcon.type.name.toLowerCase();
       }
-      return typeof propIcon === 'object'
-        ? propIcon.title || propIcon.id
-        : propIcon;
+      return typeof propIcon === "object" ? propIcon.title || propIcon.id : propIcon;
     }
 
     function getIndex(index, array) {
@@ -396,9 +325,7 @@ export default class ReactNativeRingPicker extends React.Component {
     }
 
     let getEl = (propIcon) => {
-      return React.isValidElement(propIcon)
-        ? propIcon
-        : ReactNativeRingPicker.DEFAULT_ICON(this.props.defaultIconColor);
+      return React.isValidElement(propIcon) ? propIcon : ReactNativeRingPicker.DEFAULT_ICON(this.props.defaultIconColor);
     };
 
     return this.props.icons.map((propIcon, index, array) => ({
@@ -407,7 +334,7 @@ export default class ReactNativeRingPicker extends React.Component {
       isShown: true,
       index: getIndex(index, array),
       el: getEl(propIcon),
-      position: new Animated.ValueXY(),
+      position: new Animated.ValueXY()
     }));
   }
 
@@ -416,46 +343,30 @@ export default class ReactNativeRingPicker extends React.Component {
       {
         transform: [
           {
-            rotate: this.state.pan.interpolate({
-              inputRange: [
-                -(this.GIRTH_ANGLE * this.STEP_LENGTH_TO_1_ANGLE),
-                0,
-                this.GIRTH_ANGLE * this.STEP_LENGTH_TO_1_ANGLE,
-              ],
-              outputRange: [
-                `-${this.GIRTH_ANGLE}deg`,
-                '0deg',
-                `${this.GIRTH_ANGLE}deg`,
-              ],
-            }),
-          },
-        ],
-      },
-    ];
-  }
+            rotate: this.state.pan.interpolate({ inputRange: [-(this.GIRTH_ANGLE * this.STEP_LENGTH_TO_1_ANGLE), 0, this.GIRTH_ANGLE * this.STEP_LENGTH_TO_1_ANGLE], outputRange: [`-${this.GIRTH_ANGLE}deg`, "0deg", `${this.GIRTH_ANGLE}deg`] })
+          }
+        ]
+      }
+    ]
+  };
 
   goToCurrentFocusedPage = () => {
-    this.state.currentSnappedIcon &&
-      this.props.onPress(this.state.currentSnappedIcon.id);
+    this.state.currentSnappedIcon && this.props.onPress(this.state.currentSnappedIcon.id);
   };
 
   defineAxesCoordinatesOnLayoutDisplacement = () => {
     this._wheelNavigator.measure((x, y, width, height, pageX, pageY) => {
       this.setState({
         ...this.state,
-        ICON_PATH_RADIUS:
-          height / 2 +
-          STYLES.icon.height / 2 +
-          SQUARE_DIMENSIONS.ICON_PADDING_FROM_WHEEL,
+        ICON_PATH_RADIUS: height / 2 + STYLES.icon.height / 2 + SQUARE_DIMENSIONS.ICON_PADDING_FROM_WHEEL,
         XY_AXES_COORDINATES: {
-          X: pageX + width / 2,
-          Y: pageY + height / 2,
+          X: pageX + (width / 2),
+          Y: pageY + (height / 2),
           PAGE_Y: pageY,
-          PAGE_X: pageX,
-        },
+          PAGE_X: pageX
+        }
       });
-      this.STEP_LENGTH_TO_1_ANGLE =
-        (2 * Math.PI * this.state.ICON_PATH_RADIUS) / 360;
+      this.STEP_LENGTH_TO_1_ANGLE = 2 * Math.PI * this.state.ICON_PATH_RADIUS / 360;
 
       this.calculateIconCurrentPositions();
     });
@@ -466,8 +377,8 @@ export default class ReactNativeRingPicker extends React.Component {
   };
 
   defineCurrentSection(x, y) {
-    let yAxis = y < this.state.XY_AXES_COORDINATES.Y ? 'TOP' : 'BOTTOM';
-    let xAxis = x < this.state.XY_AXES_COORDINATES.X ? 'LEFT' : 'RIGHT';
+    let yAxis = y < this.state.XY_AXES_COORDINATES.Y ? "TOP" : "BOTTOM";
+    let xAxis = x < this.state.XY_AXES_COORDINATES.X ? "LEFT" : "RIGHT";
     this.CURRENT_CIRCLE_SECTION = this.CIRCLE_SECTIONS[`${yAxis}_${xAxis}`];
   }
 
@@ -557,28 +468,16 @@ export default class ReactNativeRingPicker extends React.Component {
 
     switch (this.CURRENT_CIRCLE_SECTION) {
       case this.CIRCLE_SECTIONS.TOP_LEFT:
-        this.CURRENT_DIRECTION = getCurrentDirectionForTopLeftQuadrant(
-          differenceX,
-          differenceY,
-        );
+        this.CURRENT_DIRECTION = getCurrentDirectionForTopLeftQuadrant(differenceX, differenceY);
         break;
       case this.CIRCLE_SECTIONS.TOP_RIGHT:
-        this.CURRENT_DIRECTION = getCurrentDirectionForTopRightQuadrant(
-          differenceX,
-          differenceY,
-        );
+        this.CURRENT_DIRECTION = getCurrentDirectionForTopRightQuadrant(differenceX, differenceY);
         break;
       case this.CIRCLE_SECTIONS.BOTTOM_LEFT:
-        this.CURRENT_DIRECTION = getCurrentDirectionForBottomLeftQuadrant(
-          differenceX,
-          differenceY,
-        );
+        this.CURRENT_DIRECTION = getCurrentDirectionForBottomLeftQuadrant(differenceX, differenceY);
         break;
       case this.CIRCLE_SECTIONS.BOTTOM_RIGHT:
-        this.CURRENT_DIRECTION = getCurrentDirectionForBottomRightQuadrant(
-          differenceX,
-          differenceY,
-        );
+        this.CURRENT_DIRECTION = getCurrentDirectionForBottomRightQuadrant(differenceX, differenceY);
         break;
     }
 
@@ -609,14 +508,12 @@ export default class ReactNativeRingPicker extends React.Component {
     let highestBoundaryDegree = 270 + this.props.noExpDistCorrectionDegree;
 
     if (currentIconAngle < lowestBoundaryDegree) {
-      return (
-        currentIconAngle - (15 - 0.004165 * Math.pow(currentIconAngle - 270, 2))
-      );
-    } else if (currentIconAngle > highestBoundaryDegree) {
-      return (
-        currentIconAngle + (15 - 0.004165 * Math.pow(currentIconAngle - 270, 2))
-      );
-    } else {
+      return currentIconAngle - (15 - 0.004165 * Math.pow((currentIconAngle - 270), 2));
+    }
+    else if (currentIconAngle > highestBoundaryDegree) {
+      return currentIconAngle + (15 - 0.004165 * Math.pow((currentIconAngle - 270), 2));
+    }
+    else {
       return currentIconAngle;
     }
   }
@@ -637,21 +534,11 @@ export default class ReactNativeRingPicker extends React.Component {
      *
      * this is parabolic acceleration, basically - further the position from 270 degrees - more would be the gap from the vertical axis - thus creating the distance from center aligned icon
      */
-    currentIconAngle =
-      this.adjustCurrentIconAngleExponentially(currentIconAngle);
+    currentIconAngle = this.adjustCurrentIconAngleExponentially(currentIconAngle);
 
     return {
-      top:
-        this.state.XY_AXES_COORDINATES.Y -
-        this.state.XY_AXES_COORDINATES.PAGE_Y +
-        this.state.ICON_PATH_RADIUS *
-          Math.sin(currentIconAngle * (Math.PI / 180)),
-      left:
-        this.state.XY_AXES_COORDINATES.X -
-        this.state.XY_AXES_COORDINATES.PAGE_X -
-        STYLES.icon.width / 2 +
-        this.state.ICON_PATH_RADIUS *
-          Math.cos(currentIconAngle * (Math.PI / 180)),
+      top: this.state.XY_AXES_COORDINATES.Y - this.state.XY_AXES_COORDINATES.PAGE_Y + this.state.ICON_PATH_RADIUS * Math.sin(currentIconAngle * (Math.PI / 180)),
+      left: this.state.XY_AXES_COORDINATES.X - this.state.XY_AXES_COORDINATES.PAGE_X - STYLES.icon.width / 2 + this.state.ICON_PATH_RADIUS * Math.cos(currentIconAngle * (Math.PI / 180))
     };
   }
 
@@ -663,11 +550,7 @@ export default class ReactNativeRingPicker extends React.Component {
       this.INDEX_EXTRACTORS[id] = 0;
     }
 
-    let currentAngle =
-      270 +
-      this.state.CURRENT_ICON_SHIFT +
-      this.INDEX_EXTRACTORS[id] +
-      index * this.ICON_POSITION_ANGLE;
+    let currentAngle = (270 + this.state.CURRENT_ICON_SHIFT + this.INDEX_EXTRACTORS[id] + (index * this.ICON_POSITION_ANGLE));
 
     if (currentAngle < 270 - this.GIRTH_ANGLE / 2) {
       this.hideIconWhileMovingBehindCircle(id);
@@ -686,33 +569,29 @@ export default class ReactNativeRingPicker extends React.Component {
 
   calculateIconCurrentPositions(dx) {
     function extractCorrectRestDisplacementThreshold(dx) {
-      if (!dx || ((dx) => 0 && dx <= 1)) {
+      if (!dx || (dx => 0 && dx <= 1)) {
         return 1;
       }
 
       return 10;
     }
 
-    this.state.icons.forEach((icon, index) => {
+    this.state.icons.forEach((icon) => {
       let coordinates = this.calculateIconCurrentPosition(icon);
 
       Animated.spring(icon.position, {
         toValue: {
           x: coordinates.left,
-          y: coordinates.top,
+          y: coordinates.top
         },
         easing: Easing.linear,
         speed: 30,
         restSpeedThreshold: 10,
         bounciness: 0,
-        restDisplacementThreshold: extractCorrectRestDisplacementThreshold(dx),
-      }).start(
-        (finish) =>
-          finish.finished &&
-          typeof this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] ===
-            'function' &&
-          this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id](),
-      );
+        restDisplacementThreshold: extractCorrectRestDisplacementThreshold(dx)
+      }).start((finish) => finish.finished
+        && typeof this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id] === "function"
+        && this.ALL_ICONS_FINISH_ANIMATIONS.resolvers[icon.id]());
     });
   }
 
@@ -728,50 +607,36 @@ export default class ReactNativeRingPicker extends React.Component {
   setIconDisplayState(key, state) {
     this.setState({
       ...this.state,
-      icons: [
-        ...this.state.icons.map((icon) => {
-          if (icon.id === key) {
-            icon.isShown = state;
-          }
+      icons: [...this.state.icons.map((icon) => {
+        if (icon.id === key) {
+          icon.isShown = state
+        }
 
-          return icon;
-        }),
-      ],
+        return icon;
+      })]
     });
   }
 
   hideArrowHint() {
-    this.state.showArrowHint &&
-      this.setState({
-        ...this.state,
-        showArrowHint: false,
-      });
+    this.state.showArrowHint && this.setState({
+      ...this.state,
+      showArrowHint: false
+    });
   }
 
   render() {
-    let {onPress, style, styleIconText} = this.props;
+    let { onPress, style, styleIconText } = this.props;
 
     return (
-      <View
-        style={style}
-        onLayout={debounce(
-          this.defineAxesCoordinatesOnLayoutChangeByStylesOrScreenRotation,
-          100,
-        )}>
-        <Icons
-          icons={this.state.icons}
-          onPress={onPress}
-          styleIconText={styleIconText}
-        />
+      <View style={[style, {
+        borderWidth: 1
+      }]} onLayout={debounce(this.defineAxesCoordinatesOnLayoutChangeByStylesOrScreenRotation, 100)}>
+        <Icons icons={this.state.icons} onPress={onPress} styleIconText={styleIconText} />
         <View
           style={[STYLES.wheel]}
-          ref={(component) => (this._wheelNavigator = component)}
+          ref={component => this._wheelNavigator = component}
           onLayout={this.defineAxesCoordinatesOnLayoutDisplacement}>
-          {this.state.showArrowHint && (
-            <View style={STYLES.swipeArrowHint}>
-              <SwipeArrowHint />
-            </View>
-          )}
+          {this.state.showArrowHint && <View style={STYLES.swipeArrowHint}><SwipeArrowHint /></View>}
           <Animated.View
             style={this.rotateOnInputPixelDistanceMatchingRadianShift()}
             {...this._panResponder.panHandlers}>

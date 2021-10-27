@@ -2,6 +2,7 @@ export * from './RingPicker';
 export * from './RingPickerV2';
 export * from './RingPickerV3';
 export * from './RingPickerV4';
+export * from './RingPickerV42';
 export * from './RingPickerV5';
 export * from './RingPickerV52';
 export * from './Neumorphism';

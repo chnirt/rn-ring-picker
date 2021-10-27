@@ -13,7 +13,6 @@ export default StyleSheet.create({
         width: SQUARE_DIMENSIONS.WIDTH * 0.09,
         height: SQUARE_DIMENSIONS.WIDTH * 0.09,
         flex: 1,
-        backgroundColor: 'blue',
         justifyContent: 'center',
         alignItems: 'center',
     },

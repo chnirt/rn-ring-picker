@@ -1,13 +1,13 @@
-import React, {useRef, useState} from 'react';
-import {View, Text, Pressable, Animated, PanResponder} from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, Pressable, Animated, PanResponder } from 'react-native';
 
 export function RingPickerV2({
   data = [],
   size = 200,
   elementSize = 50,
   rect = 'top',
-  onPress = () => {},
-  onMomentumScrollEnd = () => {},
+  onPress = () => { },
+  onMomentumScrollEnd = () => { },
 }) {
   const rects = {
     top: 'top',
@@ -24,19 +24,19 @@ export function RingPickerV2({
       onPanResponderGrant: () => {
         // console.log('onPanResponderGrant');
         pan.setOffset(pan._value);
-        pan.setValue(0);
+        // pan.setValue(0);
       },
       onPanResponderMove: (evt, gestureState) => {
-        console.log(
-          'onPanResponderMove',
-          JSON.stringify(gestureState, null, 2),
-        );
-        const {dx, dy} = gestureState;
+        // console.log(
+        //   'onPanResponderMove',
+        //   JSON.stringify(gestureState, null, 2),
+        // );
+        const { dx, dy } = gestureState;
         pan.setValue(dx);
       },
       onPanResponderRelease: (evt, gestureState) => {
         // console.log('onPanResponderRelease');
-        const {dx} = gestureState;
+        const { dx, vx } = gestureState;
         pan.flattenOffset();
         // const ithCircleValue = getIthCircleValue(dx, pan);
         // const element = data[findIndexByIth(ithCircleValue)];
@@ -50,6 +50,10 @@ export function RingPickerV2({
         //   // console.log('ithCircleValue', ithCircleValue);
         //   simplifyOffset(pan);
         // });
+
+        Animated.spring(pan, {
+          toValue: handlerValue(dx, vx)
+        }).start(() => simplifyOffset(pan));
       },
     }),
   ).current;
@@ -69,6 +73,17 @@ export function RingPickerV2({
     );
     return index;
   }
+
+  const handlerValue = (dx, vx) => Math.abs(dx) > size / 8 || Math.abs(vx) > 1.3 ? getAmountForNextSlice(dx, pan._offset) : snapOffset(pan._offset);
+  const snapOffset = (offset) => { return Math.round(offset / (600 / data.length)) * 600 / data.length; }
+  function getAmountForNextSlice(dx, offset) {
+    // This just rounds to the nearest 200 to snap the circle to the correct thirds
+    const snappedOffset = snapOffset(offset);
+    // Depending on the direction, we either add 200 or subtract 200 to calculate new offset position.
+    const newOffset = dx > 0 ? snappedOffset + 200 : snappedOffset - 200;
+    return newOffset;
+  };
+
 
   function simplifyOffset(anim) {
     if (anim._value + anim._offset >= 600) anim.setOffset(anim._offset - 600);
@@ -147,13 +162,13 @@ export function RingPickerV2({
                 alignItems: 'center',
               }}
               onPress={() => {
-                const ithCircleValue = -index * deltaTheta * pxPerDeg;
-                Animated.timing(pan, {
-                  toValue: ithCircleValue,
-                  useNativeDriver: false,
-                }).start(() => {
-                  simplifyOffset(pan);
-                });
+                // const ithCircleValue = -index * deltaTheta * pxPerDeg;
+                // Animated.timing(pan, {
+                //   toValue: ithCircleValue,
+                //   useNativeDriver: false,
+                // }).start(() => {
+                //   simplifyOffset(pan);
+                // });
                 onPress(element);
               }}>
               <Text>{element?.label}</Text>

@@ -1,20 +1,50 @@
-import React from 'react';
-import {View} from 'react-native';
-import {RingPickerV5, RingPickerV52} from './src/components';
+import React, { useRef, useState } from 'react';
+import {
+  View,
+  Animated,
+  PanResponder,
+  Button,
+  Text,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
+import {
+  RingPickerV2,
+  RingPickerV42,
+  RingPickerV5,
+  RingPickerV52,
+} from './src/components';
 import RNRingPicker from './src/components/RNRingPicker/sample';
 
-const data = [...Array(6).keys()].map((element, index) => ({
+const STEP = 90;
+const data = [...Array(20).keys()].map((element, index) => ({
   id: index,
   label: element,
 }));
 
 function App() {
+  const [step, setStep] = useState(STEP);
+  const [selected, setSelected] = useState({})
   const handleOnPress = (element) => {
-    console.log('handleOnPress', element);
+    // console.log('handleOnPress', element);
+    // setSelected(element)
   };
 
   const handleOnMomentumScrollEnd = (element) => {
-    console.log('handleOnMomentumScrollEnd', element);
+    // console.log('handleOnMomentumScrollEnd', element);
+    // setSelected(element)
+  };
+
+  const onPress = (step) => {
+    data.map((item, index) => {
+      Animated.timing(item.position, {
+        toValue: item.position._value + step,
+        useNativeDriver: true,
+        speed: 30,
+        restSpeedThreshold: 10,
+        bounciness: 0,
+      }).start();
+    });
   };
 
   return (
@@ -24,9 +54,11 @@ function App() {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      {/* <RNRingPicker /> */}
+
+      {/* <RingPickerV2 data={data} /> */}
       <RingPickerV52
         data={data}
+        selectedItem={selected}
         onPress={handleOnPress}
         onMomentumScrollEnd={handleOnMomentumScrollEnd}
         size={300}

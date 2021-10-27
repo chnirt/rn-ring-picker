@@ -1,18 +1,19 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View, Animated, PanResponder, Pressable, Text} from 'react-native';
-import {debounce, range} from 'lodash';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Animated, PanResponder, Pressable, Text } from 'react-native';
+import { debounce, range } from 'lodash'
 
 export function RingPickerV52({
   visible,
   data = [],
   size = 200,
   elementSize = 50,
-  maxToRenderPerBatch,
+  maxToRenderPerBatch = 0,
   renderItem,
-  onPress = () => {},
-  onMomentumScrollEnd = () => {},
+  onPress = () => { },
+  // onMomentumScrollEnd = () => { },
 }) {
-  this.AMOUNT_OF_DATA = maxToRenderPerBatch ?? data.length;
+  this.LENGTH = data.length;
+  this.AMOUNT_OF_DATA = Math.min(maxToRenderPerBatch, this.LENGTH);
   this.GIRTH_ANGLE = 360 / this.AMOUNT_OF_DATA;
 
   // 2*π*r / 360
@@ -49,95 +50,32 @@ export function RingPickerV52({
   const pan = useRef(new Animated.Value(0)).current;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  console.log('currentIndex', currentIndex);
-
-  const rangeArray = range(
-    currentIndex - parseInt(maxToRenderPerBatch / 2, 10),
-    currentIndex + parseInt(maxToRenderPerBatch / 2, 10) + 1,
+  // console.log('currentIndex', currentIndex);
+  const indexes = range(
+    Math.round(currentIndex - parseInt(maxToRenderPerBatch / 2, 10)),
+    Math.round(currentIndex + parseInt(maxToRenderPerBatch / 2, 10) + 1),
   );
-
-  const showedData = rangeArray.map((s) => {
-    // console.log('data', data);
-    // const {item} = getItemInLoopingArray(data, s);
-    // console.log(index);
-    // return item;
-    return data[(data.length + s) % data.length];
+  // console.log("indexes---", indexes);
+  // console.log('data', data);
+  const findItemByIndex = (index) => data[(this.LENGTH + (index % this.LENGTH)) % this.LENGTH]
+  const renderedData = indexes.map((i) => {
+    // console.log('i', i);
+    return findItemByIndex(i);
   });
-  // console.log('showedData', JSON.stringify(showedData, null, 2));
-  for (let i = 0; i < parseInt(rangeArray.length / 2, 10); i++) {
-    showedData.push(showedData.shift());
+  // console.log("renderedData---", renderedData);
+  for (let i = 0; i < parseInt(indexes.length / 2, 10); i++) {
+    renderedData.push(renderedData.shift());
   }
-  for (let i = 0; i < currentIndex; i++) {
-    console.log('currentIndex', currentIndex);
-    showedData.unshift(showedData.pop());
+  if (currentIndex >= 0) {
+    for (let i = 0; i < currentIndex; i++) {
+      renderedData.unshift(renderedData.pop());
+    }
+  } else {
+    for (let i = 0; i > currentIndex; i--) {
+      renderedData.push(renderedData.shift());
+    }
   }
-  // if (currentIndex === 1) {
-  //   showedData.unshift(showedData.pop());
-  // }
-  const formattedShowedData = showedData.map((d, index) => {
-    return {
-      ...d,
-      position: index,
-      show: true,
-    };
-  });
-  console.log(
-    'formattedShowedData',
-    JSON.stringify(formattedShowedData, null, 2),
-  );
-
-  const formatData = [...data].map((item, index) => {
-    // console.log('item', item);
-    const existed = formattedShowedData.findIndex((sd) => sd.id === item.id);
-    // console.log('existed', existed);
-    // // const existed = indexs.some((i) => i === index);
-    // // const pushed = a.some((i) => i === index);
-    // // const a = indexs.slice(0, (this.AMOUNT_OF_DATA - 1) / 2);
-    // console.log(currentIndex, existed);
-    // const formatPosition = (index) => {
-    //   let position = index;
-    //   const mod = index % (data.length - 1);
-    //   console.log('index', index);
-    //   console.log('data.length - 1', data.length - 1);
-    //   console.log('mod', mod);
-    //   // if (currentIndex !== 0 && mod === 0) {
-    //   //   position -= 1;
-    //   // }
-
-    //   // if (currentIndex === 1 && index === data.length - 1) {
-    //   //   position -= 1;
-    //   // }
-    //   // if (
-    //   //   currentIndex < this.AMOUNT_OF_DATA - 1 / 2 &&
-    //   //   (index === data.length - 1 || index === data.length - 2)
-    //   // ) {
-    //   //   position -= 1;
-    //   // }
-    //   // if (currentIndex === 15) {
-    //   //   if (index === 15 || index === 14 || index === 13) {
-    //   //     position -= 1;
-    //   //   }
-    //   // }
-    //   // if (currentIndex === 14) {
-    //   //   if (index === 15 || index === 14 || index === 13 || index === 12) {
-    //   //     position -= 1;
-    //   //   }
-    //   // }
-    //   // if (currentIndex === 13) {
-    //   //   position -= 1;
-    //   // }
-
-    //   return position;
-    // };
-    return {
-      ...item,
-      position: existed,
-      show: existed !== -1,
-    };
-  });
-
-  // console.log('formatData', JSON.stringify(formatData, null, 2));
+  // console.log('renderedData', JSON.stringify(renderedData, null, 2));
 
   const panResponder = useRef(
     PanResponder.create({
@@ -148,33 +86,33 @@ export function RingPickerV52({
         resetCurrentValues();
         setPreviousDifferenceLengths(0, 0);
         pan.setValue(pan._value);
+        pan.setOffset(0)
       },
       onPanResponderMove: (evt, gestureState) => {
         // console.log('onPanResponderMove');
         defineCurrentSection(gestureState.moveX, gestureState.moveY);
         checkPreviousDifferenceLengths(gestureState.dx, gestureState.dy);
         pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
-        const index = defineIndex(pan);
-        setCurrentIndex(index);
+
+        const ithCircleValue = getIthCircleValue(pan)
+        const index = -ithCircleValue / this.GIRTH_ANGLE
+        setCurrentIndex(index)
       },
       onPanResponderRelease: (evt, gestureState) => {
         // console.log('onPanResponderRelease');
         pan.flattenOffset();
-        // const {item} = defineIndex(pan);
-        // onMomentumScrollEnd(item);
-        const ithCircleValue = getIthCircleValue(pan);
 
+        const ithCircleValue = getIthCircleValue(pan);
+        // console.log("ithCircleValue---", ithCircleValue);
         Animated.spring(pan, {
           toValue: ithCircleValue,
           friction: 5,
           tension: 10,
           useNativeDriver: false,
-        }).start(() => {
-          // console.log(
-          //   'CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current',
-          //   CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current,
-          // );
-          simplifyOffset(pan);
+        }).start(({ finished }) => {
+          if (finished) {
+            simplifyOffset(pan)
+          }
         });
       },
     }),
@@ -329,29 +267,41 @@ export function RingPickerV52({
     });
   }
 
-  function getIthCircleValue(deltaAnim) {
+  function getIthCircleValue(deltaAnim, step = 0) {
     const selectedCircle = Math.round(
-      (deltaAnim._value + deltaAnim._offset) / this.GIRTH_ANGLE,
+      (deltaAnim._value + deltaAnim._offset + step) / this.GIRTH_ANGLE,
     );
     return selectedCircle * this.GIRTH_ANGLE;
   }
 
-  function getIthCircleValueWithIndex(index) {
-    const selectedCircle = index;
-    return selectedCircle * this.GIRTH_ANGLE;
-  }
+  // function getIthCircleValueWithIndex(index) {
+  //   const selectedCircle = index;
+  //   return selectedCircle * this.GIRTH_ANGLE;
+  // }
 
-  function findIndexByIth(ith) {
-    const stepIndex =
-      -ith / STEP_LENGTH_TO_1_ANGLERef.current / this.GIRTH_ANGLE;
-    return stepIndex;
-  }
+  // function findIndexByIth(ith) {
+  //   const stepIndex =
+  //     -ith / STEP_LENGTH_TO_1_ANGLERef.current / this.GIRTH_ANGLE;
+  //   return stepIndex;
+  // }
 
-  function defineIndex(deltaAnim) {
-    const ithCircleValue = getIthCircleValue(deltaAnim);
-    const index = findIndexByIth(ithCircleValue);
-    return (maxToRenderPerBatch + index) % maxToRenderPerBatch;
+  // function defineIndex(deltaAnim) {
+  //   const ithCircleValue = getIthCircleValue(deltaAnim);
+  //   // console.log("ithCircleValue---", ithCircleValue);
+  //   // console.log("CURRENT_CIRCLE_SECTIONRef.current---", CURRENT_CIRCLE_SECTIONRef.current);
+  //   const index = findIndexByIth(ithCircleValue);
+  //   return (maxToRenderPerBatch + index) % maxToRenderPerBatch;
+  // }
+
+  const getAmountForNextSlice = (dx, offset) => {
+    // This just rounds to the nearest 200 to snap the circle to the correct thirds
+    const snappedOffset = snapOffset(offset);
+    // Depending on the direction, we either add 200 or subtract 200 to calculate new offset position. (200 are equal to 120deg!)
+    // const newOffset = dx > 0 ? snappedOffset + 200 : snappedOffset - 200; // fixed for 3 circles
+    const newOffset = dx > 0 ? snappedOffset + STEP_LENGTH_TO_1_ANGLERef.current / this.LENGTH : snappedOffset - STEP_LENGTH_TO_1_ANGLERef.current / this.LENGTH;
+    return newOffset;
   }
+  const snapOffset = (offset) => { return Math.round(offset / (STEP_LENGTH_TO_1_ANGLERef.current / this.LENGTH)) * STEP_LENGTH_TO_1_ANGLERef.current / this.LENGTH; }
 
   function simplifyOffset(anim) {
     if (anim._value + anim._offset >= STEP_LENGTH_TO_1_ANGLERef.current)
@@ -395,17 +345,6 @@ export function RingPickerV52({
     defineAxesCoordinatesOnLayoutDisplacement();
   }
 
-  function getItemInLoopingArray(arr, position) {
-    let item;
-    let index = position % arr.length;
-    item = arr[index];
-    if (index < 0) {
-      index = arr.length + index;
-      item = arr[index];
-    }
-    return {index, item};
-  }
-
   if (this.AMOUNT_OF_DATA === 0) {
     return null;
   }
@@ -421,13 +360,13 @@ export function RingPickerV52({
           width: size,
           aspectRatio: 1,
           // height: size * 0.85,
-          // borderColor: 'red',
-          // borderWidth: 1,
-          // overflow: 'hidden',
+          borderColor: 'red',
+          borderWidth: 1,
+          overflow: 'hidden',
         }}
         ref={wheelNavigatorRef}
         onLayout={defineAxesCoordinatesOnLayoutDisplacement}>
-        {formattedShowedData?.map((element, index) => {
+        {renderedData?.map((element, index) => {
           function rotateOnInputPixelDistanceMatchingElement(index) {
             return [
               {
@@ -451,7 +390,20 @@ export function RingPickerV52({
             ];
           }
 
-          const colors = ['red', 'green', 'blue', 'orange', 'yellow', 'pink'];
+          {/* const backgroundColor = pan.interpolate({
+            inputRange: [
+              -(this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current),
+              0,
+              this.GIRTH_ANGLE * STEP_LENGTH_TO_1_ANGLERef.current,
+            ],
+            outputRange: [
+              "#00aaFF",
+              "#808080",
+              "#00aaFF"
+            ],
+          }) */}
+
+          {/* const colors = ['red', 'green', 'blue', 'orange', 'yellow', 'pink']; */ }
 
           return (
             <Animated.View
@@ -464,7 +416,7 @@ export function RingPickerV52({
                   zIndex: 1,
                   elevation: 1,
                 },
-                ...rotateOnInputPixelDistanceMatchingElement(element.position),
+                ...rotateOnInputPixelDistanceMatchingElement(index),
               ]}>
               <Pressable
                 style={{
@@ -475,32 +427,63 @@ export function RingPickerV52({
                   // backgroundColor: colors[index],
                 }}
                 onPress={() => {
-                  // const ithCircleValue = getIthCircleValueWithIndex(-index);
-                  // Animated.spring(pan, {
-                  //   toValue: ithCircleValue,
-                  //   friction: 5,
-                  //   tension: 10,
-                  //   useNativeDriver: false,
-                  // }).start();
-                  console.log(index);
+                  // TODO: Scroll to index
                   onPress(element);
+                  const foundItem = findItemByIndex(currentIndex)
+                  // if (element.id === foundItem.id) return
+                  let newIndex = index
+                  if (index > Math.floor(renderedData.length / 2)) {
+                    newIndex = index - renderedData.length
+                  }
+                  console.log("STEP_LENGTH_TO_1_ANGLERef.current", STEP_LENGTH_TO_1_ANGLERef.current)
+                  console.log("CURRENT_CIRCLE_SECTIONRef.current", CURRENT_CIRCLE_SECTIONRef.current)
+                  console.log("CURRENT_DIRECTIONRef.current", CURRENT_DIRECTIONRef.current)
+                  console.log("PREVIOUS_POSITIONRef.current.X", PREVIOUS_POSITIONRef.current.X)
+                  console.log("PREVIOUS_POSITIONRef.current.Y", PREVIOUS_POSITIONRef.current.Y)
+
+
+
+
+                  // console.log("currentIndex", currentIndex);
+                  // console.log("index", index);
+                  // console.log("newIndex", newIndex);
+                  // console.log("-newIndex * this.GIRTH_ANGLE", -newIndex * this.GIRTH_ANGLE);
+                  const newIthCircleValue = getIthCircleValue(pan, this.GIRTH_ANGLE)
+                  CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current = newIthCircleValue
+                  // console.log("newIthCircleValue", newIthCircleValue)
+
+                  // pan.setValue(newIthCircleValue)
+                  Animated.spring(pan, {
+                    toValue: newIthCircleValue,
+                    friction: 5,
+                    tension: 10,
+                    useNativeDriver: false,
+                  }).start(({ finished }) => {
+                    if (finished) {
+                      simplifyOffset(pan)
+                      const newCurrentIndex = -newIthCircleValue / this.GIRTH_ANGLE
+                      // console.log(newCurrentIndex)
+                      // setCurrentIndex(newCurrentIndex)
+
+                      // setTimeout(() => {
+                      // }, 1000)
+                    }
+                  });
                 }}>
                 {typeof renderItem === 'function' ? (
-                  renderItem({item: element, index})
+                  renderItem({ item: element, index })
                 ) : (
                   <View
                     style={{
                       borderColor: 'orange',
                       borderWidth: 1,
-                      width: element?.show ? elementSize : 0,
-                      height: element?.show ? elementSize : 0,
+                      width: elementSize,
+                      height: elementSize,
                       borderRadius: elementSize / 2,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
                     <Text>
-                      {/* i-{index} */}
-                      {/* l- */}
                       {element?.label}
                     </Text>
                   </View>
@@ -520,41 +503,6 @@ export function RingPickerV52({
               width: size,
               height: size,
             }}>
-            {/* {data.map((element, index) => {
-              return (
-                <Animated.View
-                  key={index}
-                  style={[
-                    {
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      transform: [
-                        {
-                          rotate: `${this.GIRTH_ANGLE * index}deg`,
-                        },
-                      ],
-                    },
-                  ]}>
-                  <Pressable
-                    style={{
-                      position: 'absolute',
-                      top: -size / 2,
-                      borderColor: 'orange',
-                      borderWidth: 1,
-                      height: elementSize,
-                      width: elementSize,
-                      borderRadius: elementSize / 2,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    onPress={() => {
-                      onPress(element);
-                    }}>
-                    <Text>{element?.label}</Text>
-                  </Pressable>
-                </Animated.View>
-              );
-            })} */}
             {/* <View
               style={{
                 width: size,
@@ -573,3 +521,15 @@ export function RingPickerV52({
     </View>
   );
 }
+
+RingPickerV52.propTypes = {
+  maxToRenderPerBatch: function (props, propName, componentName) {
+    if (props[propName] % 2 === 0) {
+      return new Error(
+        'Invalid prop `' + propName + '` supplied to' +
+        ' `' + componentName + '`. Expected Odd Number, got Even Number. Validation failed.'
+      );
+    }
+    return null
+  },
+};

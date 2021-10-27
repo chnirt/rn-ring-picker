@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View, Animated, PanResponder, Pressable, Text} from 'react-native';
-import {debounce, range} from 'lodash';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Animated, PanResponder, Pressable, Text } from 'react-native';
+import { debounce, range } from 'lodash';
 
 export function RingPickerV5({
   visible,
@@ -9,11 +9,12 @@ export function RingPickerV5({
   elementSize = 50,
   maxToRenderPerBatch,
   renderItem,
-  onPress = () => {},
-  onMomentumScrollEnd = () => {},
+  onPress = () => { },
+  onMomentumScrollEnd = () => { },
+  selectedItem
 }) {
   this.AMOUNT_OF_DATA = data.length;
-  this.GIRTH_ANGLE = 360 / (maxToRenderPerBatch ?? this.AMOUNT_OF_DATA);
+  this.GIRTH_ANGLE = 360 / this.AMOUNT_OF_DATA;
 
   // 2*π*r / 360
   const STEP_LENGTH_TO_1_ANGLERef = useRef(1);
@@ -54,54 +55,6 @@ export function RingPickerV5({
     currentIndex - parseInt(maxToRenderPerBatch / 2, 10),
     currentIndex + parseInt(maxToRenderPerBatch / 2, 10) + 1,
   );
-  console.log('rangeArray', rangeArray);
-  const formatData = rangeArray.map((s) => {
-    // console.log('data', data);
-    // const {item} = getItemInLoopingArray(data, s);
-    // console.log(index);
-    // return item;
-    return data[(data.length + s) % data.length];
-  });
-  console.log('formatData', formatData);
-  for (let i = 0; i < parseInt(rangeArray.length / 2, 10); i++) {
-    formatData.push(formatData.shift());
-  }
-  let newArray = formatData.map((item, index) => ({
-    ...item,
-    position: index * this.GIRTH_ANGLE,
-  }));
-  console.log('newArray', newArray);
-  // const a = formatData.slice(0, (maxToRenderPerBatch - 1) / 2);
-  // const b = formatData.slice(
-  //   (maxToRenderPerBatch - 1) / 2 - maxToRenderPerBatch,
-  // );
-  // const c = [...b, ...a];
-  // newArray = c;
-  // console.log('currentIndex', currentIndex);
-  // if (currentIndex >= 1) {
-  //   const d = newArray.slice(0, this.AMOUNT_OF_DATA - 1 - currentIndex);
-  //   const e = newArray.slice(-currentIndex);
-  //   const f = [...e, ...d];
-  //   newArray = f;
-  //   if (currentIndex > this.AMOUNT_OF_DATA - 1) {
-  //     CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current = 0;
-  //     pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
-  //   }
-  // }
-  // if (currentIndex < 0) {
-  //   // const {index: itemIndex} = getItemInLoopingArray(data, currentIndex);
-  //   // console.log(itemIndex);
-  //   // console.log(currentIndex);
-  //   const g = newArray.slice(Math.abs(currentIndex), this.AMOUNT_OF_DATA - 1);
-  //   const h = newArray.slice(0, Math.abs(currentIndex));
-  //   const i = [...g, ...h];
-  //   newArray = i;
-  //   if (currentIndex < -(this.AMOUNT_OF_DATA - 1)) {
-  //     CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current = 0;
-  //     pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
-  //   }
-  // }
-  const e = newArray;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -118,13 +71,13 @@ export function RingPickerV5({
         defineCurrentSection(gestureState.moveX, gestureState.moveY);
         checkPreviousDifferenceLengths(gestureState.dx, gestureState.dy);
         pan.setValue(CURRENT_VECTOR_DIFFERENCE_LENGTHRef.current);
-        const {index} = defineIndexItem(pan);
+        const { index } = defineIndexItem(pan);
         setCurrentIndex(index);
       },
       onPanResponderRelease: (evt, gestureState) => {
         // console.log('onPanResponderRelease');
         pan.flattenOffset();
-        const {item} = defineIndexItem(pan);
+        const { item } = defineIndexItem(pan);
         onMomentumScrollEnd(item);
         const ithCircleValue = getIthCircleValue(pan);
         Animated.spring(pan, {
@@ -361,7 +314,7 @@ export function RingPickerV5({
     if (index < 0) {
       item = arr[arr.length + index];
     }
-    return {index, item};
+    return { index, item };
   }
 
   if (this.AMOUNT_OF_DATA === 0) {
@@ -380,12 +333,15 @@ export function RingPickerV5({
           aspectRatio: 1,
           // height: size * 0.85,
           // borderColor: 'red',
-          // borderWidth: 1,
+          borderWidth: 1,
           // overflow: 'hidden',
+          // justifyContent: "center",
+          // alignItems: "center"
         }}
         ref={wheelNavigatorRef}
         onLayout={defineAxesCoordinatesOnLayoutDisplacement}>
-        {e?.map((element, index) => {
+        {data?.map((element, index) => {
+          const isSelected = selectedItem?.id === element.id
           function rotateOnInputPixelDistanceMatchingElement(index) {
             return [
               {
@@ -414,7 +370,8 @@ export function RingPickerV5({
               key={index}
               style={[
                 {
-                  justifyContent: 'center',
+                  // borderWidth: 1,
+                  // justifyContent: 'center',
                   alignItems: 'center',
                   top: size / 2,
                   zIndex: 1,
@@ -441,7 +398,7 @@ export function RingPickerV5({
                 }}>
                 <View
                   style={{
-                    borderColor: 'orange',
+                    borderColor: isSelected ? "red" : 'orange',
                     borderWidth: 1,
                     height: elementSize,
                     width: elementSize,
@@ -517,7 +474,7 @@ export function RingPickerV5({
                 </Animated.View>
               );
             })} */}
-            {/* <View
+            <View
               style={{
                 width: size,
                 height: size,
@@ -528,7 +485,7 @@ export function RingPickerV5({
                 borderBottomColor: 'yellow',
                 borderWidth: size / 10,
               }}
-            /> */}
+            />
           </View>
         </Animated.View>
       </View>
